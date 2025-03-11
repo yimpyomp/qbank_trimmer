@@ -63,6 +63,14 @@ def extract_question_difficulty(page_text):
         return None
 
 
+def extract_answer(page_text):
+    match = re.search(answer_pattern, page_text)
+    if match:
+        return match.group(1)
+    else:
+        return None
+
+
 def combine_answers():
     # Only run this once
     # Create combined solution file
@@ -113,6 +121,7 @@ def catalog_questions():
             next_text = current_text
         # Grab question ID
         current_id = extract_question_id(current_text)
+        # Skip to next page if no question ID is present
         if not current_id:
             continue
         if current_id not in question_catalog.keys():
@@ -126,10 +135,14 @@ def catalog_questions():
             question_catalog[current_id].append(extract_skill(current_text))
         else:
             question_catalog[current_id].append(extract_skill(next_text))
-        if len(question_catalog[current_id]) != 2:
+        if extract_answer(current_text):
+            question_catalog[current_id].append(extract_answer(current_text))
+        else:
+            question_catalog[current_id].append(extract_answer(next_text))
+
+        if len(question_catalog[current_id]) != 3:
             print(f'Error on page {i + 1}')
 
-    print(question_catalog)
     return question_catalog
 
 
