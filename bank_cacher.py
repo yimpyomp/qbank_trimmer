@@ -89,7 +89,6 @@ def combine_questions():
 
 
 def verify_master_copies():
-    print(pathlib.Path.cwd())
     # Alternate logic for debugging
     if 'debug' in str(pathlib.Path.cwd()):
         return True
@@ -115,20 +114,20 @@ def catalog_questions():
         # Grab question ID
         current_id = extract_question_id(current_text)
         if not current_id:
-            pass
+            continue
         if current_id not in question_catalog.keys():
             question_catalog[current_id] = []
         # Check if correct answer, difficulty, learning area, skill exist on current page
         if extract_learning_area(current_text):
             question_catalog[current_id].append(extract_learning_area(current_text))
         else:
-            print('LA fallback')
             question_catalog[current_id].append(extract_learning_area(next_text))
         if extract_skill(current_text):
             question_catalog[current_id].append(extract_skill(current_text))
         else:
-            print('skill fallback')
             question_catalog[current_id].append(extract_skill(next_text))
+        if len(question_catalog[current_id]) != 2:
+            print(f'Error on page {i + 1}')
 
     print(question_catalog)
     return question_catalog
