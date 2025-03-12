@@ -12,7 +12,7 @@ skill_list = []
 skill_pattern = r"Skill\s+([\s\S]+?)\s+Di"
 learning_area_pattern = r"Domain\s+([\s\S]+?)\s+Skill"
 id_pattern = r'ID:\s*(.*)'
-difficulty_pattern = r'Question Difficulty:\s*(.*)'
+difficulty_pattern = r'culty:\s*(.*)'
 answer_pattern = r'Correct Answer:\s*([A-Z])'
 
 
@@ -129,29 +129,50 @@ def catalog_questions():
         if current_id not in question_catalog.keys():
             question_catalog[current_id] = []
         # Check if correct answer, difficulty, learning area, skill exist on current page
+
+        # Learning area
         if extract_learning_area(current_text):
             question_catalog[current_id].append(extract_learning_area(current_text))
         else:
             question_catalog[current_id].append(extract_learning_area(next_text))
             single_page = False
+
+        # Skill
         if extract_skill(current_text):
             question_catalog[current_id].append(extract_skill(current_text))
         else:
             question_catalog[current_id].append(extract_skill(next_text))
             single_page = False
+
+        # Difficulty
+        if extract_question_difficulty(current_text):
+            question_catalog[current_id].append(extract_question_difficulty(current_text))
+        else:
+            question_catalog[current_id].append(extract_question_difficulty(next_text))
+            single_page = False
+
+        # Answer
         if extract_answer(current_text):
             question_catalog[current_id].append(extract_answer(current_text))
         else:
             question_catalog[current_id].append(extract_answer(next_text))
             single_page = False
+
+        # Check flag and add appropriate marker
         if not single_page:
             question_catalog[current_id].append(1)
         else:
             question_catalog[current_id].append(0)
-        if len(question_catalog[current_id]) != 4:
+
+        # Validate list length
+        if len(question_catalog[current_id]) != 5:
             print(f'Error on page {i + 1}')
 
     return question_catalog
+
+
+def filter_learning_areas():
+    pass
 
 
 
