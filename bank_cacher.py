@@ -114,6 +114,8 @@ def catalog_questions():
     combined_pages = combined_answers.pages
     # Begin iterating through pages
     for i in range(len(combined_pages)):
+        # Flag for pages containing information on multiple pages
+        single_page = True
         current_text = combined_pages[i].extract_text()
         if i + 1 < len(combined_pages):
             next_text = combined_pages[i + 1].extract_text()
@@ -131,16 +133,22 @@ def catalog_questions():
             question_catalog[current_id].append(extract_learning_area(current_text))
         else:
             question_catalog[current_id].append(extract_learning_area(next_text))
+            single_page = False
         if extract_skill(current_text):
             question_catalog[current_id].append(extract_skill(current_text))
         else:
             question_catalog[current_id].append(extract_skill(next_text))
+            single_page = False
         if extract_answer(current_text):
             question_catalog[current_id].append(extract_answer(current_text))
         else:
             question_catalog[current_id].append(extract_answer(next_text))
-
-        if len(question_catalog[current_id]) != 3:
+            single_page = False
+        if not single_page:
+            question_catalog[current_id].append(1)
+        else:
+            question_catalog[current_id].append(0)
+        if len(question_catalog[current_id]) != 4:
             print(f'Error on page {i + 1}')
 
     return question_catalog
