@@ -171,8 +171,32 @@ def catalog_questions():
     return question_catalog
 
 
-def filter_learning_areas():
-    pass
+def filter_learning_areas(learning_area_filter, catalog):
+    trimmed_catalog = {}
+    for entry in catalog.keys():
+        question = catalog[entry]
+        for item in learning_area_filter:
+            if item in question:
+                trimmed_catalog[entry] = question
+    return trimmed_catalog
 
 
+def filter_skills(skill_filter, catalog):
+    trimmed_catalog = {}
+    for entry in catalog.keys():
+        question = catalog[entry]
+        for item in skill_filter:
+            if item in question:
+                trimmed_catalog[entry] = question
+    return trimmed_catalog
+
+
+def filter_difficulty(difficulty_filter, catalog):
+    trimmed_catalog = {}
+    for entry in catalog.keys():
+        question = catalog[entry]
+        for item in difficulty_filter:
+            if item in question:
+                trimmed_catalog[entry] = question
+    return trimmed_catalog
 
