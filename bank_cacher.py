@@ -160,9 +160,9 @@ def catalog_questions():
 
         # Check flag and add appropriate marker
         if not single_page:
-            question_catalog[current_id].append(1)
+            question_catalog[current_id].append([i, i + 1])
         else:
-            question_catalog[current_id].append(0)
+            question_catalog[current_id].append([i])
 
         # Validate list length
         if len(question_catalog[current_id]) != 5:
