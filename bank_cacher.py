@@ -1,3 +1,5 @@
+import json
+
 from pypdf import PdfReader, PdfWriter
 import pathlib
 import os
@@ -160,8 +162,10 @@ def catalog_questions():
 
         # Check flag and add appropriate marker
         if not single_page:
+            print(f'Adding {[i, i + 1]}')
             question_catalog[current_id].append([i, i + 1])
         else:
+            print(f'Adding {[i]}')
             question_catalog[current_id].append([i])
 
         # Validate list length
@@ -200,3 +204,47 @@ def filter_difficulty(difficulty_filter, catalog):
                 trimmed_catalog[entry] = question
     return trimmed_catalog
 
+
+def trim_blank_copy(filtered_catalog, master_blank):
+    final_questions = consolidate_pages(filtered_catalog)
+    trimmed_writer = PdfWriter()
+    for page in final_questions:
+        trimmed_writer.add_page(master_blank.pages[page])
+    trimmer = open('output.pdf', 'wb')
+    trimmed_writer.write(trimmer)
+    trimmer.close()
+    trimmed_writer.close()
+    print('Trimmed sample generated')
+    return None
+
+
+def catalog_blank(catalog):
+    blank_pages = PdfReader('bank/combined_questions.pdf').pages
+    for i in range(len(blank_pages)):
+        current_text = blank_pages[i].extract_text()
+        current_id = extract_question_id(current_text)
+        if current_id:
+            catalog[current_id].append([i])
+    return catalog
+
+
+def update_cache(catalog):
+    with open('catalog.json', 'w') as f:
+        json.dump(catalog, f, indent=2)
+        f.close()
+    print('Catalog updated')
+    return None
+
+
+def consolidate_pages(catalog):
+    page_list = []
+    for entry in catalog.keys():
+        page_list.extend(catalog[entry][-1])
+    return page_list
+
+
+def generate_catalog():
+    working_catalog = catalog_questions()
+    working_catalog = catalog_blank(working_catalog)
+    update_cache(working_catalog)
+    return working_catalog
