@@ -9,7 +9,7 @@ import re
 
 learning_area_key = {"LA1": ["Craft and Structure", []], "LA2": ["Information and Ideas", []],
                      "LA3": ["Standard English Conventions", []], "LA4": ["Expression of Ideas", []]}
-difficulty_levels = ['ez', 'med', 'hard']
+difficulty_levels = ['Easy', 'Medium', 'Hard']
 skill_list = []
 skill_pattern = r"Skill\s+([\s\S]+?)\s+Di"
 learning_area_pattern = r"Domain\s+([\s\S]+?)\s+Skill"
@@ -199,6 +199,7 @@ def filter_difficulty(difficulty_filter, catalog):
     trimmed_catalog = {}
     for entry in catalog.keys():
         question = catalog[entry]
+        print(question[2])
         for item in difficulty_filter:
             if item in question:
                 trimmed_catalog[entry] = question
@@ -211,6 +212,20 @@ def trim_blank_copy(filtered_catalog, master_blank):
     for page in final_questions:
         trimmed_writer.add_page(master_blank.pages[page])
     trimmer = open('output.pdf', 'wb')
+    trimmed_writer.write(trimmer)
+    trimmer.close()
+    trimmed_writer.close()
+    print('Trimmed sample generated')
+    return None
+
+
+def trim_answer_key(filtered_catalog, combined_answers):
+    # Please fucking refactor me soon before this gets too confusing in two weeks
+    final_questions = consolidate_answer_pages(filtered_catalog)
+    trimmed_writer = PdfWriter()
+    for page in final_questions:
+        trimmed_writer.add_page(combined_answers.pages[page])
+    trimmer = open('solution_output.pdf', 'wb')
     trimmed_writer.write(trimmer)
     trimmer.close()
     trimmed_writer.close()
@@ -240,6 +255,13 @@ def consolidate_pages(catalog):
     page_list = []
     for entry in catalog.keys():
         page_list.extend(catalog[entry][-1])
+    return page_list
+
+
+def consolidate_answer_pages(catalog):
+    page_list = []
+    for entry in catalog.keys():
+        page_list.extend(catalog[entry][-2])
     return page_list
 
 
