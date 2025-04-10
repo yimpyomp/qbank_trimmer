@@ -69,7 +69,7 @@ def extract_learning_area(page_text):
 
 def extract_question_id(page_text):
     """
-    Oh look, another extract function. Wanna guess what it does?
+    Oh look, another extract function. Would you care to guess what it does?
     :param page_text:
     :return:
     """
