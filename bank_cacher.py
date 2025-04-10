@@ -19,6 +19,10 @@ answer_pattern = r'Correct Answer:\s*([A-Z])'
 
 
 def initial_config():
+    """
+    Check if combined question/answer files exist, create combined files if not
+    :return:
+    """
     if not pathlib.Path('solns/combined_answers.pdf').exists():
         combine_answers()
     if not pathlib.Path('bank/combined_questions.pdf').exists():
@@ -27,13 +31,22 @@ def initial_config():
 
 
 def read_file(path):
+    """
+    Creates PDF reader object
+    :param path: Filepath of pdf file to be read
+    :return: The object. I don't like writing these
+    """
     target_file = pathlib.Path(path)
-
     file_reader = PdfReader(target_file)
     return file_reader
 
 
 def extract_skill(page_text):
+    """
+    Determines which skill is applicable to question
+    :param page_text: Raw text of page
+    :return: Skill of current page if found, none if not found
+    """
     match = re.search(skill_pattern, page_text, re.DOTALL)
     if match:
         return match.group(1).strip()
@@ -42,6 +55,11 @@ def extract_skill(page_text):
 
 
 def extract_learning_area(page_text):
+    """
+    Same as extract skill but for learning area
+    :param page_text: I haven't slept in a while
+    :return: I am not repeating myself
+    """
     match = re.search(learning_area_pattern, page_text, re.DOTALL)
     if match:
         return match.group(1).strip()
@@ -50,6 +68,11 @@ def extract_learning_area(page_text):
 
 
 def extract_question_id(page_text):
+    """
+    Oh look, another extract function. Wanna guess what it does?
+    :param page_text:
+    :return:
+    """
     match = re.search(id_pattern, page_text)
     if match:
         return match.group(1)
@@ -58,6 +81,11 @@ def extract_question_id(page_text):
 
 
 def extract_question_difficulty(page_text):
+    """
+    another one
+    :param page_text:
+    :return:
+    """
     match = re.search(difficulty_pattern, page_text)
     if match:
         return match.group(1)
@@ -66,6 +94,11 @@ def extract_question_difficulty(page_text):
 
 
 def extract_answer(page_text):
+    """
+    and another one
+    :param page_text:
+    :return:
+    """
     match = re.search(answer_pattern, page_text)
     if match:
         return match.group(1)
@@ -74,6 +107,10 @@ def extract_answer(page_text):
 
 
 def combine_answers():
+    """
+    Creates one large pdf from the various solution files
+    :return: Nothing
+    """
     # Only run this once
     # Create combined solution file
     answer_merger = PdfWriter()
@@ -87,6 +124,10 @@ def combine_answers():
 
 
 def combine_questions():
+    """
+    Same as the answer function but this time for the files without answers
+    :return:
+    """
     # Creates one big file with all questions contained within
     question_merger = PdfWriter()
     bank_directory = pathlib.Path('bank')
@@ -99,6 +140,10 @@ def combine_questions():
 
 
 def verify_master_copies():
+    """
+    Ensures that master files exist
+    :return: Errors mostly
+    """
     # Alternate logic for debugging
     if 'debug' in str(pathlib.Path.cwd()):
         return True
@@ -109,6 +154,10 @@ def verify_master_copies():
 
 
 def catalog_questions():
+    """
+    Scrape through the combined answer file to catalog all question info
+    :return:
+    """
     question_catalog = {}
     # Verify and load combined solution file
     verify_master_copies()
@@ -176,6 +225,12 @@ def catalog_questions():
 
 
 def filter_learning_areas(learning_area_filter, catalog):
+    """
+    Does what it says it does
+    :param learning_area_filter: List of learning areas to be targeted
+    :param catalog: Big ol json
+    :return: dictionary of filtered stuff
+    """
     trimmed_catalog = {}
     for entry in catalog.keys():
         question = catalog[entry]
@@ -186,6 +241,12 @@ def filter_learning_areas(learning_area_filter, catalog):
 
 
 def filter_skills(skill_filter, catalog):
+    """
+    Like learning area filter but for skills
+    :param skill_filter:
+    :param catalog:
+    :return:
+    """
     trimmed_catalog = {}
     for entry in catalog.keys():
         question = catalog[entry]
@@ -196,6 +257,12 @@ def filter_skills(skill_filter, catalog):
 
 
 def filter_difficulty(difficulty_filter, catalog):
+    """
+    take a wild guess
+    :param difficulty_filter:
+    :param catalog:
+    :return:
+    """
     trimmed_catalog = {}
     for entry in catalog.keys():
         question = catalog[entry]
@@ -207,6 +274,12 @@ def filter_difficulty(difficulty_filter, catalog):
 
 
 def trim_blank_copy(filtered_catalog, master_blank):
+    """
+    Creates a blank version of all questions to be answered
+    :param filtered_catalog: Catalog of questions to be included
+    :param master_blank: PDF Reader object of combined blank copy
+    :return: None, saves a PDF of selected questions
+    """
     final_questions = consolidate_pages(filtered_catalog)
     trimmed_writer = PdfWriter()
     for page in final_questions:
@@ -220,6 +293,12 @@ def trim_blank_copy(filtered_catalog, master_blank):
 
 
 def trim_answer_key(filtered_catalog, combined_answers):
+    """
+    Same as blank copy but with the answers
+    :param filtered_catalog:
+    :param combined_answers:
+    :return:
+    """
     # Please fucking refactor me soon before this gets too confusing in two weeks
     final_questions = consolidate_answer_pages(filtered_catalog)
     trimmed_writer = PdfWriter()
@@ -244,6 +323,11 @@ def catalog_blank(catalog):
 
 
 def update_cache(catalog):
+    """
+    I don't know why I was so dedicated the word cache. It isn't even appropriate here
+    :param catalog:
+    :return:
+    """
     with open('catalog.json', 'w') as f:
         json.dump(catalog, f, indent=2)
         f.close()
@@ -252,6 +336,11 @@ def update_cache(catalog):
 
 
 def consolidate_pages(catalog):
+    """
+    Creates a list of only page indices in the provided catalog
+    :param catalog: Dictionary of questions to be included in final copy
+    :return: List of only page indices
+    """
     page_list = []
     for entry in catalog.keys():
         page_list.extend(catalog[entry][-1])
@@ -259,6 +348,11 @@ def consolidate_pages(catalog):
 
 
 def consolidate_answer_pages(catalog):
+    """
+    Guess
+    :param catalog:
+    :return:
+    """
     page_list = []
     for entry in catalog.keys():
         page_list.extend(catalog[entry][-2])
@@ -266,6 +360,10 @@ def consolidate_answer_pages(catalog):
 
 
 def generate_catalog():
+    """
+    I am sleepy
+    :return:
+    """
     working_catalog = catalog_questions()
     working_catalog = catalog_blank(working_catalog)
     update_cache(working_catalog)
