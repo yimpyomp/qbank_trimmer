@@ -312,7 +312,7 @@ def trim_answer_key(filtered_catalog, combined_answers):
     return None
 
 
-def catalog_blank(catalog):
+def add_blank_pages_to_catalog(catalog):
     blank_pages = PdfReader('bank/combined_questions.pdf').pages
     for i in range(len(blank_pages)):
         current_text = blank_pages[i].extract_text()
@@ -365,6 +365,102 @@ def generate_catalog():
     :return:
     """
     working_catalog = catalog_questions()
-    working_catalog = catalog_blank(working_catalog)
+    working_catalog = add_blank_pages_to_catalog(working_catalog)
     update_cache(working_catalog)
     return working_catalog
+
+
+def save_catalog_blank_results(matched_ids, missing_from_catalog, missing_blank_pages,
+                               output_path="catalog_blank_results.txt"):
+    """
+    Save a report showing how well blank-question pages were matched
+    to the existing answer-key catalog.
+
+    Args:
+        matched_ids: list of question IDs successfully matched.
+        missing_from_catalog: list of tuples like (question_id, page_index)
+            for IDs found in the blank PDF but missing from the answer catalog.
+        missing_blank_pages: list of question IDs from the answer catalog
+            that did not receive blank-question pages.
+        output_path: file path where the report should be saved.
+    """
+
+    with open(output_path, "w") as file:
+        file.write("Catalog Blank Results\n")
+        file.write("=====================\n\n")
+
+        file.write("Summary\n")
+        file.write("-------\n")
+        file.write(f"Matched blank questions: {len(matched_ids)}\n")
+        file.write(f"Blank IDs not found in answer catalog: {len(missing_from_catalog)}\n")
+        file.write(f"Answer catalog IDs missing blank pages: {len(missing_blank_pages)}\n\n")
+
+        file.write("Blank IDs not found in answer catalog\n")
+        file.write("-------------------------------------\n")
+
+        if missing_from_catalog:
+            for question_id, page_index in missing_from_catalog:
+                # page_index + 1 is for human-readable PDF page numbers
+                file.write(f"- {question_id} on blank PDF page {page_index + 1}\n")
+        else:
+            file.write("None\n")
+
+        file.write("\nAnswer catalog IDs missing blank pages\n")
+        file.write("-------------------------------------\n")
+
+        if missing_blank_pages:
+            for question_id in missing_blank_pages:
+                file.write(f"- {question_id}\n")
+        else:
+            file.write("None\n")
+
+
+def save_catalog(catalog, output_path="catalog.json"):
+    """
+    Save the full question catalog to a JSON file.
+
+    Args:
+        catalog: Dictionary containing question metadata and page numbers.
+        output_path: Where the catalog should be saved.
+    """
+
+    with open(output_path, "w") as file:
+        json.dump(catalog, file, indent=4)
+
+
+
+def catalog_blank(catalog):
+    blank_pages = PdfReader("bank/combined_questions.pdf").pages
+
+    matched_ids = []
+    missing_from_catalog = []
+
+    for i in range(len(blank_pages)):
+        current_text = blank_pages[i].extract_text()
+        current_id = extract_question_id(current_text)
+
+        if current_id:
+            if current_id in catalog:
+                catalog[current_id].append([i])
+                matched_ids.append(current_id)
+            else:
+                missing_from_catalog.append((current_id, i))
+
+    missing_blank_pages = []
+
+    for question_id, question_data in catalog.items():
+        # This assumes entries should have 6 items after blank pages are added:
+        # [learning_area, skill, difficulty, answer, answer_pages, blank_pages]
+        if len(question_data) < 6:
+            missing_blank_pages.append(question_id)
+
+    save_catalog_blank_results(
+        matched_ids,
+        missing_from_catalog,
+        missing_blank_pages
+    )
+    save_catalog(catalog)
+    return catalog
+
+result = catalog_questions()
+catalog_blank(result)
