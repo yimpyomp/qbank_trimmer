@@ -40,7 +40,6 @@ def filter_difficulty(difficulty_filter, catalog):
     trimmed_catalog = {}
     for entry in catalog.keys():
         question = catalog[entry]
-        print(question[2])
         for item in difficulty_filter:
             if item in question:
                 trimmed_catalog[entry] = question
