@@ -44,7 +44,8 @@ def extract_question_id(page_text):
     """
     match = re.search(id_pattern, page_text)
     if match:
-        return match.group(1)
+        question_id = match.group(1)
+        return normalize_question_id(question_id)
     else:
         return None
 
@@ -73,3 +74,15 @@ def extract_answer(page_text):
         return match.group(1)
     else:
         return None
+
+
+def normalize_question_id(question_id):
+    if not question_id:
+        return None
+
+    question_id = question_id.strip()
+
+    if question_id.endswith(" Answer"):
+        question_id = question_id.removesuffix(" Answer")
+
+    return question_id
