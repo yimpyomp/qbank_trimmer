@@ -1,9 +1,6 @@
 import json
-
 from pypdf import PdfReader, PdfWriter
 import pathlib
-import os
-import pickle
 import re
 
 
