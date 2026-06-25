@@ -178,48 +178,55 @@ def catalog_questions():
         if not current_id:
             continue
         if current_id not in question_catalog.keys():
-            question_catalog[current_id] = []
+            question_catalog[current_id] = {
+                "learning_area": None,
+                "skill": None,
+                "difficulty": None,
+                "answer": None,
+                "answer_key_page": [],
+                "blank_question_page": [],
+            }
         # Check if correct answer, difficulty, learning area, skill exist on current page
 
         # Learning area
         if extract_learning_area(current_text):
-            question_catalog[current_id].append(extract_learning_area(current_text))
+            question_catalog[current_id]["learning_area"] = extract_learning_area(current_text)
         else:
-            question_catalog[current_id].append(extract_learning_area(next_text))
+            question_catalog[current_id]["learning_area"] = extract_learning_area(next_text)
             single_page = False
 
         # Skill
         if extract_skill(current_text):
-            question_catalog[current_id].append(extract_skill(current_text))
+            question_catalog[current_id]["skill"] = extract_skill(current_text)
         else:
-            question_catalog[current_id].append(extract_skill(next_text))
+            question_catalog[current_id]["skill"] = extract_skill(next_text)
             single_page = False
 
         # Difficulty
         if extract_question_difficulty(current_text):
-            question_catalog[current_id].append(extract_question_difficulty(current_text))
+            question_catalog[current_id]["difficulty"] = extract_question_difficulty(current_text)
         else:
-            question_catalog[current_id].append(extract_question_difficulty(next_text))
+            question_catalog[current_id]["difficulty"] = extract_question_difficulty(next_text)
             single_page = False
 
         # Answer
         if extract_answer(current_text):
-            question_catalog[current_id].append(extract_answer(current_text))
+            question_catalog[current_id]["answer"] = extract_answer(current_text)
         else:
-            question_catalog[current_id].append(extract_answer(next_text))
+            question_catalog[current_id]["answer"] = extract_answer(next_text)
             single_page = False
 
         # Check flag and add appropriate marker
         if not single_page:
             print(f'Adding {[i, i + 1]}')
-            question_catalog[current_id].append([i, i + 1])
+            question_catalog[current_id]["answer_key_page"] = [i + 1, i + 2]
         else:
             print(f'Adding {[i]}')
-            question_catalog[current_id].append([i])
+            question_catalog[current_id]["answer_key_page"] = [i + 1]
 
         # Validate list length
-        if len(question_catalog[current_id]) != 5:
-            print(f'Error on page {i + 1}')
+        #if len(question_catalog[current_id]) != 5:
+        #    print(f'Error on page {i + 1}')
 
     return question_catalog
 
@@ -369,20 +376,19 @@ def generate_catalog():
     update_cache(working_catalog)
     return working_catalog
 
+#######################################################################################################################
+# Not my code
+# TODO: Rewrite this myself
 
-def save_catalog_blank_results(matched_ids, missing_from_catalog, missing_blank_pages,
-                               output_path="catalog_blank_results.txt"):
+def save_catalog_blank_results(
+        matched_ids,
+        missing_from_catalog,
+        missing_blank_pages,
+        output_path="catalog_blank_results.txt"
+):
     """
     Save a report showing how well blank-question pages were matched
     to the existing answer-key catalog.
-
-    Args:
-        matched_ids: list of question IDs successfully matched.
-        missing_from_catalog: list of tuples like (question_id, page_index)
-            for IDs found in the blank PDF but missing from the answer catalog.
-        missing_blank_pages: list of question IDs from the answer catalog
-            that did not receive blank-question pages.
-        output_path: file path where the report should be saved.
     """
 
     with open(output_path, "w") as file:
@@ -400,7 +406,6 @@ def save_catalog_blank_results(matched_ids, missing_from_catalog, missing_blank_
 
         if missing_from_catalog:
             for question_id, page_index in missing_from_catalog:
-                # page_index + 1 is for human-readable PDF page numbers
                 file.write(f"- {question_id} on blank PDF page {page_index + 1}\n")
         else:
             file.write("None\n")
@@ -430,28 +435,38 @@ def save_catalog(catalog, output_path="catalog.json"):
 
 
 def catalog_blank(catalog):
+    """
+    Scan the combined blank-question PDF and add blank-question page numbers
+    to the existing question catalog.
+    """
+
     blank_pages = PdfReader("bank/combined_questions.pdf").pages
 
     matched_ids = []
     missing_from_catalog = []
 
+    # Make sure every entry has the blank-question field
+    for question_id in catalog:
+        if "blank_question_page" not in catalog[question_id]:
+            catalog[question_id]["blank_question_page"] = []
+
     for i in range(len(blank_pages)):
         current_text = blank_pages[i].extract_text()
         current_id = extract_question_id(current_text)
 
-        if current_id:
-            if current_id in catalog:
-                catalog[current_id].append([i])
-                matched_ids.append(current_id)
-            else:
-                missing_from_catalog.append((current_id, i))
+        if not current_id:
+            continue
+
+        if current_id in catalog:
+            catalog[current_id]["blank_question_page"].append(i + 1)
+            matched_ids.append(current_id)
+        else:
+            missing_from_catalog.append((current_id, i + 1))
 
     missing_blank_pages = []
 
     for question_id, question_data in catalog.items():
-        # This assumes entries should have 6 items after blank pages are added:
-        # [learning_area, skill, difficulty, answer, answer_pages, blank_pages]
-        if len(question_data) < 6:
+        if not question_data["blank_question_page"]:
             missing_blank_pages.append(question_id)
 
     save_catalog_blank_results(
@@ -459,8 +474,11 @@ def catalog_blank(catalog):
         missing_from_catalog,
         missing_blank_pages
     )
+
     save_catalog(catalog)
+
     return catalog
 
-result = catalog_questions()
-catalog_blank(result)
+# No longer needed, catalog mildly verified
+#result = catalog_questions()
+#catalog_blank(result)
