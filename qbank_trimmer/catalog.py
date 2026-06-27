@@ -6,7 +6,7 @@ from .extraction import (
     extract_answer,
     extract_skill)
 from pypdf import PdfReader
-from .config import COMBINED_QUESTIONS_PATH, CATALOG_PATH
+from .config import COMBINED_QUESTIONS_PATH, CATALOG_PATH, CATALOG_REPORT_PATH
 import json
 from .reports import save_catalog_blank_results
 
@@ -131,7 +131,8 @@ def catalog_blank(catalog):
     save_catalog_blank_results(
         matched_ids,
         missing_from_catalog,
-        missing_blank_pages
+        missing_blank_pages,
+        output_path=CATALOG_REPORT_PATH
     )
 
     save_catalog(catalog)
@@ -144,3 +145,6 @@ def save_catalog(catalog, output_path=CATALOG_PATH):
         json.dump(catalog, f, indent=4)
 
 
+def load_catalog(catalog_path=CATALOG_PATH):
+    with open(catalog_path, "r") as f:
+        return json.load(f)
