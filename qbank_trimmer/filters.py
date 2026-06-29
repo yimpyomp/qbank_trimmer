@@ -8,6 +8,10 @@ def normalize_filter_text(text):
 
 
 def filter_catalog(catalog, learning_area=None, skill=None, difficulty=None):
+    learning_area = normalize_filter_text(learning_area)
+    skill = normalize_filter_text(skill)
+    difficulty = normalize_filter_text(difficulty)
+
     # New dictionary to store results
     filtered_catalog = {}
 
