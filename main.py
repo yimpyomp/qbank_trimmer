@@ -63,15 +63,43 @@ def parse_arguments():
         help="Use the first matching questions instead of randomly sampling."
     )
 
+    parser.add_argument(
+        "--generate-catalog",
+        action="store_true",
+        help="Generate a new catalog from the provided question and answer PDFs."
+    )
+
+    parser.add_argument(
+        "--questions-source",
+        default="bank/combined_questions.pdf",
+        help="Path to the combined blank-question PDF."
+    )
+
+    parser.add_argument(
+        "--answers-source",
+        default="solns/combined_answers.pdf",
+        help="Path to the combined answer PDF."
+    )
+
     return parser.parse_args()
 
 
 def main():
     args = parse_arguments()
 
+
     catalog_path = Path(args.catalog)
     questions_output_path = Path(args.questions_output)
     answers_output_path = Path(args.answers_output)
+
+    if args.generate_catalog:
+        print(f"Generating catalog at {catalog_path}...")
+        catalog = generate_catalog(
+            Path(args.answers_source),
+            Path(args.questions_source),
+        )
+        save_catalog(catalog, output_path=catalog_path)
+
 
     print(f"Loading catalog from {catalog_path}...")
     catalog = load_catalog(catalog_path)
