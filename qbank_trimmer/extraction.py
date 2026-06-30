@@ -1,88 +1,108 @@
 import re
 
-skill_pattern = r"Skill\s+([\s\S]+?)\s+Di"
-learning_area_pattern = r"Domain\s+([\s\S]+?)\s+Skill"
-id_pattern = r'ID:\s*(.*)'
-difficulty_pattern = r'culty:\s*(.*)'
-answer_pattern = r'Correct Answer:\s*([A-Z])'
+
+DOMAIN_NAMES = [
+    "Craft and Structure",
+    "Information and Ideas",
+    "Standard English Conventions",
+    "Expression of Ideas",
+    "Algebra",
+    "Advanced Math",
+    "Problem-Solving and Data Analysis",
+    "Geometry and Trigonometry",
+]
+
+DIFFICULTY_NAMES = {"Easy", "Medium", "Hard"}
 
 
+id_pattern = re.compile(r"Question\s+ID:\s*([A-Za-z0-9]+)")
+answer_pattern = re.compile(r"Correct Answer:\s*([^\n\r]+)")
 
 
-
-def extract_skill(page_text):
-    """
-    Determines which skill is applicable to question
-    :param page_text: Raw text of page
-    :return: Skill of current page if found, none if not found
-    """
-    match = re.search(skill_pattern, page_text, re.DOTALL)
-    if match:
-        return match.group(1).strip()
-    else:
+def clean_extracted_text(text):
+    if text is None:
         return None
 
-
-def extract_learning_area(page_text):
-    """
-    Same as extract skill but for learning area
-    :param page_text: I haven't slept in a while
-    :return: I am not repeating myself
-    """
-    match = re.search(learning_area_pattern, page_text, re.DOTALL)
-    if match:
-        return match.group(1).strip()
-    else:
-        return None
+    return " ".join(text.split())
 
 
 def extract_question_id(page_text):
-    """
-    Oh look, another extract function. Would you care to guess what it does?
-    :param page_text:
-    :return:
-    """
-    match = re.search(id_pattern, page_text)
+    match = id_pattern.search(page_text or "")
     if match:
-        question_id = match.group(1)
-        return normalize_question_id(question_id)
-    else:
-        return None
-
-
-def extract_question_difficulty(page_text):
-    """
-    another one
-    :param page_text:
-    :return:
-    """
-    match = re.search(difficulty_pattern, page_text)
-    if match:
-        return match.group(1)
-    else:
-        return None
+        return clean_extracted_text(match.group(1))
+    return None
 
 
 def extract_answer(page_text):
-    """
-    and another one
-    :param page_text:
-    :return:
-    """
-    match = re.search(answer_pattern, page_text)
+    match = answer_pattern.search(page_text or "")
     if match:
-        return match.group(1)
-    else:
-        return None
+        return clean_extracted_text(match.group(1))
+    return None
 
 
-def normalize_question_id(question_id):
-    if not question_id:
-        return None
+def extract_metadata(page_text):
+    text = clean_extracted_text(page_text or "")
 
-    question_id = question_id.strip()
+    # PyPDF sometimes extracts SAT as "SA T" and Test as "T est"
+    text = re.sub(r"\bS\s*A\s*T\b", "SAT", text)
+    text = re.sub(r"\bT\s*est\b", "Test", text)
 
-    if question_id.endswith(" Answer"):
-        question_id = question_id.removesuffix(" Answer")
+    row_match = re.search(
+        r"Assessment\s+Test\s+Domain\s+Skill\s+Difficulty\s+(.+?)\s+Question\b",
+        text,
+        re.IGNORECASE,
+    )
 
-    return question_id
+    if not row_match:
+        return {
+            "learning_area": None,
+            "skill": None,
+            "difficulty": None,
+        }
+
+    row = row_match.group(1)
+
+    # Remove the Assessment/Test cells from the row.
+    row = re.sub(
+        r"^SAT\s+(Math|Reading\s+and\s+Writing)\s+",
+        "",
+        row,
+        flags=re.IGNORECASE,
+    )
+
+    difficulty = None
+    for possible_difficulty in DIFFICULTY_NAMES:
+        if re.search(rf"\b{possible_difficulty}\b$", row):
+            difficulty = possible_difficulty
+            row = re.sub(rf"\b{possible_difficulty}\b$", "", row).strip()
+            break
+
+    learning_area = None
+    skill = None
+
+    # Sort longest first so "Problem-Solving and Data Analysis" wins
+    # before any shorter accidental partial match.
+    for possible_domain in sorted(DOMAIN_NAMES, key=len, reverse=True):
+        if row.startswith(possible_domain):
+            learning_area = possible_domain
+            skill = row[len(possible_domain):].strip()
+            break
+
+    return {
+        "learning_area": learning_area,
+        "skill": skill,
+        "difficulty": difficulty,
+    }
+
+
+def extract_learning_area(page_text):
+    return extract_metadata(page_text)["learning_area"]
+
+
+def extract_skill(page_text):
+    return extract_metadata(page_text)["skill"]
+
+
+def extract_question_difficulty(page_text):
+    return extract_metadata(page_text)["difficulty"]
+
