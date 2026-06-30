@@ -12,6 +12,14 @@ def parse_arguments():
     )
 
     parser.add_argument(
+        "-s",
+        "--subject",
+        choices={"rw", "math"},
+        required=True,
+        help="Subject to generate questions for"
+    )
+
+    parser.add_argument(
         "-c",
         "--count",
         type=int,
@@ -91,6 +99,7 @@ def main():
     catalog_path = Path(args.catalog)
     questions_output_path = Path(args.questions_output)
     answers_output_path = Path(args.answers_output)
+    catalog_subject = args.subject
 
     if args.generate_catalog:
         print(f"Generating catalog at {catalog_path}...")

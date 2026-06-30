@@ -55,10 +55,16 @@ def catalog_questions(answer_pdf_path):
     return question_catalog
 
 
-def generate_catalog(answer_pdf_path, question_pdf_path):
-    working_catalog = catalog_questions(answer_pdf_path)
-    working_catalog = catalog_blank(working_catalog, question_pdf_path)
+def generate_catalog(answer_pdf_path, question_pdf_path, subject):
+    if subject == "rw":
+        working_catalog = catalog_questions(answer_pdf_path)
+        working_catalog = catalog_blank(working_catalog, question_pdf_path)
+    elif subject == "math":
+        working_catalog = catalog_math_solutions_plumber(answer_pdf_path)
+        working_catalog = catalog_math_blank_plumber(question_pdf_path, working_catalog)
+
     save_catalog(working_catalog)
+
     return working_catalog
 
 
@@ -172,6 +178,9 @@ def catalog_math_blank_plumber(blank_pdf_path, math_catalog):
 
             if current_id:
                 last_id = current_id
+                math_catalog[current_id]["blank_question_index"].append(page_index)
+                math_catalog[current_id]["blank_question_page"].append(page_number)
+
 
             else:
                 if last_id in math_catalog:
