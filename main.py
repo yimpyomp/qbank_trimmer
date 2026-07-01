@@ -41,7 +41,7 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        "-s",
+        "-k",
         "--skill",
         # TODO: Add list of options
         help="Optional skill filter",
@@ -106,6 +106,7 @@ def main():
         catalog = generate_catalog(
             Path(args.answers_source),
             Path(args.questions_source),
+            catalog_subject
         )
         save_catalog(catalog, output_path=catalog_path)
 
