@@ -11,6 +11,7 @@ from .config import COMBINED_QUESTIONS_PATH, CATALOG_PATH, CATALOG_REPORT_PATH
 import json
 from .reports import save_catalog_blank_results
 import pdfplumber
+import time
 
 
 # Use this for RW questions only
@@ -124,14 +125,17 @@ def catalog_math_solutions_plumber(answer_pdf_path):
     # Begin iterating through file
     with pdfplumber.open(answer_pdf_path) as pdf:
         for page_index, page in enumerate(pdf.pages):
+            # Pause cataloging every 100 pages
+
             # Get text and info tables for the page
             page_text = page.extract_text() or ""
-            page_table = page.extract_table()
+
             page_number = page_index + 1
             # Check if page contains a question ID, add number to previous entry if not
             current_id = extract_question_id(page_text)
             if current_id:
                 last_id = current_id
+                page_table = page.extract_table()
             if not current_id:
                 if last_id in question_catalog:
                     question_catalog[last_id]["answer_key_page"].append(page_number)
@@ -170,7 +174,6 @@ def catalog_math_blank_plumber(blank_pdf_path, math_catalog):
         for page_index, page in enumerate(pdf.pages):
             # Get page number, extract tables and text
             page_number = page_index + 1
-            page_table = page.extract_table()
             page_text = page.extract_text() or ""
 
             # Attempt to extract question ID
