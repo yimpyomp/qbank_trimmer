@@ -1,11 +1,11 @@
-from .pdf_tools import verify_master_copies, read_file
+from .pdf_tools import read_file
 from .extraction import (
     extract_question_id,
     extract_learning_area,
     extract_question_difficulty,
     extract_answer,
     extract_skill,
-    extract_metadata, clean_extracted_text)
+    extract_metadata, clean_extracted_text, repair_difficulty)
 from pypdf import PdfReader
 from .config import COMBINED_QUESTIONS_PATH, CATALOG_PATH, CATALOG_REPORT_PATH
 import json
@@ -167,6 +167,8 @@ def catalog_math_solutions_plumber(answer_pdf_path):
                 skill = page_table[1][3]
                 difficulty = page_table[1][4]
 
+                skill, difficulty = repair_difficulty(skill, difficulty)
+
                 if difficulty in {"Easy", "Medium", "Hard"}:
                     question_catalog[current_id]["learning_area"] = clean_extracted_text(learning_area)
                     question_catalog[current_id]["skill"] = clean_extracted_text(skill)
@@ -211,5 +213,6 @@ def catalog_math_blank_plumber(blank_pdf_path, math_catalog):
                 continue
 
     return math_catalog
+
 
 

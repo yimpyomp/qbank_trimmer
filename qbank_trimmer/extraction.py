@@ -1,4 +1,5 @@
 import re
+from .config import MATH_LEARNING_AREAS, DIFFICULTY_LEVELS
 
 
 DOMAIN_NAMES = [
@@ -105,4 +106,30 @@ def extract_skill(page_text):
 
 def extract_question_difficulty(page_text):
     return extract_metadata(page_text)["difficulty"]
+
+
+def repair_difficulty(skill, difficulty):
+    if difficulty in DIFFICULTY_LEVELS:
+        return skill, difficulty
+
+    if not skill:
+        return skill, difficulty
+
+    skill_words = skill.split()
+
+    matches = []
+    for word in skill_words:
+        if word in DIFFICULTY_LEVELS:
+            matches.append(word)
+
+    if len(matches) == 1:
+        repaired_difficulty = matches[0]
+        repaired_skill = " ".join(word for word in skill_words if word != repaired_difficulty)
+        return repaired_skill, repaired_difficulty
+
+    else:
+        return skill, difficulty
+
+
+
 
