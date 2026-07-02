@@ -5,7 +5,7 @@ from .extraction import (
     extract_question_difficulty,
     extract_answer,
     extract_skill,
-    extract_metadata)
+    extract_metadata, clean_extracted_text)
 from pypdf import PdfReader
 from .config import COMBINED_QUESTIONS_PATH, CATALOG_PATH, CATALOG_REPORT_PATH
 import json
@@ -63,8 +63,6 @@ def generate_catalog(answer_pdf_path, question_pdf_path, subject):
     elif subject == "math":
         working_catalog = catalog_math_solutions_plumber(answer_pdf_path)
         working_catalog = catalog_math_blank_plumber(question_pdf_path, working_catalog)
-
-    save_catalog(working_catalog)
 
     return working_catalog
 
@@ -128,7 +126,10 @@ def catalog_math_solutions_plumber(answer_pdf_path):
             # Pause cataloging every 100 pages
 
             # Get text and info tables for the page
-            page_text = page.extract_text() or ""
+            try:
+                page_text = page.extract_text_simple() or ""
+            except AttributeError:
+                page_text = page.extract_text() or ""
 
             page_number = page_index + 1
             # Check if page contains a question ID, add number to previous entry if not
@@ -139,6 +140,10 @@ def catalog_math_solutions_plumber(answer_pdf_path):
             if not current_id:
                 if last_id in question_catalog:
                     question_catalog[last_id]["answer_key_page"].append(page_number)
+                    if not question_catalog[last_id]["answer"]:
+                        current_answer = extract_answer(page_text)
+                        if current_answer:
+                            question_catalog[last_id]["answer"] = current_answer
                 continue
 
             if current_id not in question_catalog:
@@ -158,9 +163,19 @@ def catalog_math_solutions_plumber(answer_pdf_path):
                 question_catalog[current_id]["answer"] = current_answer
 
             if page_table and len(page_table) >= 2 and len(page_table[1]) >= 5:
-                question_catalog[current_id]["learning_area"] = page_table[1][2]
-                question_catalog[current_id]["skill"] = page_table[1][3]
-                question_catalog[current_id]["difficulty"] = page_table[1][4]
+                learning_area = page_table[1][2]
+                skill = page_table[1][3]
+                difficulty = page_table[1][4]
+
+                if difficulty in {"Easy", "Medium", "Hard"}:
+                    question_catalog[current_id]["learning_area"] = clean_extracted_text(learning_area)
+                    question_catalog[current_id]["skill"] = clean_extracted_text(skill)
+                    question_catalog[current_id]["difficulty"] = clean_extracted_text(difficulty)
+
+                else:
+                    question_catalog[current_id]["learning_area"] = extract_learning_area(page_text)
+                    question_catalog[current_id]["skill"] = extract_skill(page_text)
+                    question_catalog[current_id]["difficulty"] = extract_question_difficulty(page_text)
 
     return question_catalog
 
@@ -174,12 +189,16 @@ def catalog_math_blank_plumber(blank_pdf_path, math_catalog):
         for page_index, page in enumerate(pdf.pages):
             # Get page number, extract tables and text
             page_number = page_index + 1
-            page_text = page.extract_text() or ""
+
+            try:
+                page_text = page.extract_text_simple() or ""
+            except AttributeError:
+                page_text = page.extract_text() or ""
 
             # Attempt to extract question ID
             current_id = extract_question_id(page_text)
 
-            if current_id:
+            if current_id and current_id in math_catalog:
                 last_id = current_id
                 math_catalog[current_id]["blank_question_index"].append(page_index)
                 math_catalog[current_id]["blank_question_page"].append(page_number)
