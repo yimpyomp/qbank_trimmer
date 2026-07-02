@@ -18,6 +18,8 @@ DIFFICULTY_NAMES = {"Easy", "Medium", "Hard"}
 
 id_pattern = re.compile(r"Question\s+ID:\s*([A-Za-z0-9]+)")
 answer_pattern = re.compile(r"Correct Answer:\s*([^\n\r]+)")
+fallback_answer_pattern_a = re.compile(r"the correct answer is\s+(.+?)\.", flags=re.IGNORECASE)
+fallback_answer_pattern_b = re.compile(r"Choice\s+([A-D])\s+is\s+correct", flags=re.IGNORECASE)
 
 
 def clean_extracted_text(text):
@@ -38,6 +40,15 @@ def extract_answer(page_text):
     match = answer_pattern.search(page_text or "")
     if match:
         return clean_extracted_text(match.group(1))
+
+    match_a = fallback_answer_pattern_a.search(page_text or "")
+    match_b = fallback_answer_pattern_b.search(page_text or "")
+    if match_a:
+        return match_a.group(1)
+
+    if match_b:
+        return match_b.group(1).upper()
+
     return None
 
 

@@ -123,8 +123,6 @@ def catalog_math_solutions_plumber(answer_pdf_path):
     # Begin iterating through file
     with pdfplumber.open(answer_pdf_path) as pdf:
         for page_index, page in enumerate(pdf.pages):
-            # Pause cataloging every 100 pages
-
             # Get text and info tables for the page
             try:
                 page_text = page.extract_text_simple() or ""
@@ -175,9 +173,10 @@ def catalog_math_solutions_plumber(answer_pdf_path):
                     question_catalog[current_id]["difficulty"] = clean_extracted_text(difficulty)
 
                 else:
+                    skill, difficulty = repair_difficulty(extract_skill(page_text), extract_question_difficulty(page_text))
                     question_catalog[current_id]["learning_area"] = extract_learning_area(page_text)
-                    question_catalog[current_id]["skill"] = extract_skill(page_text)
-                    question_catalog[current_id]["difficulty"] = extract_question_difficulty(page_text)
+                    question_catalog[current_id]["skill"] = skill
+                    question_catalog[current_id]["difficulty"] = difficulty
 
     return question_catalog
 
