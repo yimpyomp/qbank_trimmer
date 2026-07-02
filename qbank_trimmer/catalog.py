@@ -7,11 +7,9 @@ from .extraction import (
     extract_skill,
     extract_metadata, clean_extracted_text, repair_difficulty)
 from pypdf import PdfReader
-from .config import COMBINED_QUESTIONS_PATH, CATALOG_PATH, CATALOG_REPORT_PATH
+from .config import CATALOG_PATH
 import json
-from .reports import save_catalog_blank_results
 import pdfplumber
-import time
 
 
 # Use this for RW questions only

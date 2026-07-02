@@ -1,5 +1,5 @@
 import re
-from .config import MATH_LEARNING_AREAS, DIFFICULTY_LEVELS
+from .config import DIFFICULTY_LEVELS
 
 
 DOMAIN_NAMES = [
@@ -12,8 +12,6 @@ DOMAIN_NAMES = [
     "Problem-Solving and Data Analysis",
     "Geometry and Trigonometry",
 ]
-
-DIFFICULTY_NAMES = {"Easy", "Medium", "Hard"}
 
 
 id_pattern = re.compile(r"Question\s+ID:\s*([A-Za-z0-9]+)")
@@ -83,7 +81,7 @@ def extract_metadata(page_text):
     )
 
     difficulty = None
-    for possible_difficulty in DIFFICULTY_NAMES:
+    for possible_difficulty in DIFFICULTY_LEVELS:
         if re.search(rf"\b{possible_difficulty}\b$", row):
             difficulty = possible_difficulty
             row = re.sub(rf"\b{possible_difficulty}\b$", "", row).strip()
