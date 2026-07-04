@@ -1,6 +1,5 @@
 import argparse
 from pathlib import Path
-from qbank_trimmer.pdf_tools import initial_config
 from qbank_trimmer.catalog import generate_catalog, save_catalog, catalog_blank, load_catalog
 from qbank_trimmer.generation import generate_question_pdf, generate_answer_pdf
 from qbank_trimmer.filters import filter_catalog, select_questions
@@ -23,7 +22,6 @@ def parse_arguments():
         "-c",
         "--count",
         type=int,
-        required=True,
         help="Number of questions to include"
     )
 
@@ -89,6 +87,13 @@ def parse_arguments():
         help="Path to the combined answer PDF."
     )
 
+    parser.add_argument(
+        "--catalog-only",
+        help="Generate catalogs only",
+        action="store_true"
+    )
+
+
     return parser.parse_args()
 
 
@@ -109,6 +114,10 @@ def main():
             catalog_subject
         )
         save_catalog(catalog, output_path=catalog_path)
+
+        if args.catalog_only:
+            print(f"Catalog saved to {catalog_path}")
+            return
 
 
     print(f"Loading catalog from {catalog_path}...")

@@ -10,6 +10,7 @@ from pypdf import PdfReader
 from .config import CATALOG_PATH
 import json
 import pdfplumber
+from tqdm import tqdm
 
 
 # Use this for RW questions only
@@ -17,6 +18,9 @@ def catalog_questions(answer_pdf_path):
     question_catalog = {}
     combined_answers = read_file(answer_pdf_path)
     pages = combined_answers.pages
+
+    # Progress bar
+    total_pages = len(pages)
 
     current_id = None
 
@@ -120,7 +124,7 @@ def catalog_math_solutions_plumber(answer_pdf_path):
 
     # Begin iterating through file
     with pdfplumber.open(answer_pdf_path) as pdf:
-        for page_index, page in enumerate(pdf.pages):
+        for page_index, page in enumerate(tqdm(pdf.pages, desc="Cataloging math solutions")):
             # Get text and info tables for the page
             try:
                 page_text = page.extract_text_simple() or ""
@@ -140,6 +144,7 @@ def catalog_math_solutions_plumber(answer_pdf_path):
                         current_answer = extract_answer(page_text)
                         if current_answer:
                             question_catalog[last_id]["answer"] = current_answer
+                page.flush_cache()
                 continue
 
             if current_id not in question_catalog:
@@ -175,6 +180,7 @@ def catalog_math_solutions_plumber(answer_pdf_path):
                     question_catalog[current_id]["learning_area"] = extract_learning_area(page_text)
                     question_catalog[current_id]["skill"] = skill
                     question_catalog[current_id]["difficulty"] = difficulty
+            page.flush_cache()
 
     return question_catalog
 

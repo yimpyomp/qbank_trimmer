@@ -41,9 +41,6 @@ def filter_catalog(catalog, learning_area=None, skill=None, difficulty=None):
 
 
 def select_questions(catalog, number_of_questions, randomize=True):
-    if number_of_questions <= 0:
-        raise ValueError("number_of_questions must be greater than 0")
-
     question_ids = catalog.keys()
     if randomize:
         selected_ids = random.sample(question_ids, number_of_questions)

@@ -76,4 +76,3 @@ def generate_answer_pdf(
 
 
 
-
