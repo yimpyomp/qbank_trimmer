@@ -5,6 +5,7 @@ from qbank_trimmer.generation import generate_question_pdf, generate_answer_pdf
 from qbank_trimmer.filters import filter_catalog, select_questions
 from qbank_trimmer.config import CATALOG_PATH, GENERATED_DIR
 
+
 def parse_arguments():
     parser = argparse.ArgumentParser(
         description="Generate custom collections of SAT questions"

@@ -13,6 +13,7 @@ import pdfplumber
 from tqdm import tqdm
 
 
+
 # Use this for RW questions only
 def catalog_questions(answer_pdf_path):
     question_catalog = {}
@@ -180,6 +181,19 @@ def catalog_math_solutions_plumber(answer_pdf_path):
                     question_catalog[current_id]["learning_area"] = extract_learning_area(page_text)
                     question_catalog[current_id]["skill"] = skill
                     question_catalog[current_id]["difficulty"] = difficulty
+
+            # Attempting new method of extracting question information
+            # Need a more elegant solution at some point
+            if None in question_catalog[current_id].values():
+                tables = page.extract_tables()[0]
+                learning_area = clean_extracted_text(tables[1][2])
+                skill = clean_extracted_text(tables[1][3])
+                difficulty = clean_extracted_text(tables[1][4])
+
+                if difficulty in {"Easy", "Medium", "Hard"}:
+                    question_catalog[current_id]["learning_area"] = clean_extracted_text(learning_area)
+                    question_catalog[current_id]["skill"] = clean_extracted_text(skill)
+                    question_catalog[current_id]["difficulty"] = clean_extracted_text(difficulty)
             page.flush_cache()
 
     return question_catalog
@@ -218,4 +232,8 @@ def catalog_math_blank_plumber(blank_pdf_path, math_catalog):
     return math_catalog
 
 
-
+def debug_this(entry, page_text, page_table):
+    if None in entry.values():
+        print(f"--------------------------------------------------------------------------------------------------\n"
+              f"Null entry found\nPage Text:{page_text}\nPage Table: {page_table}\n"
+              f"--------------------------------------------------------------------------------------------------\n")
