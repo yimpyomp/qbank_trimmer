@@ -3,7 +3,7 @@ from pathlib import Path
 from qbank_trimmer.catalog import generate_catalog, save_catalog, catalog_blank, load_catalog
 from qbank_trimmer.generation import generate_question_pdf, generate_answer_pdf
 from qbank_trimmer.filters import filter_catalog, select_questions
-from qbank_trimmer.config import CATALOG_PATH, GENERATED_DIR
+from qbank_trimmer.config import CATALOG_PATHS, GENERATED_DIR
 
 
 def parse_arguments():
@@ -48,8 +48,7 @@ def parse_arguments():
 
     parser.add_argument(
         "--catalog",
-        default=CATALOG_PATH,
-        help="Path to the saved catalog JSON file."
+        help="Optional override path to a saved catalog.json."
     )
 
     parser.add_argument(
@@ -101,8 +100,8 @@ def parse_arguments():
 def main():
     args = parse_arguments()
 
-
-    catalog_path = Path(args.catalog)
+    catalog_subject = args.subject
+    catalog_path = Path(args.catalog) if args.catalog else CATALOG_PATHS[catalog_subject]
     questions_output_path = Path(args.questions_output)
     answers_output_path = Path(args.answers_output)
     catalog_subject = args.subject
@@ -114,7 +113,11 @@ def main():
             Path(args.questions_source),
             catalog_subject
         )
+        print("Cataloging complete")
+        print(catalog)
+        print("Saving catalog")
         save_catalog(catalog, output_path=catalog_path)
+        print("Catalog save complete")
 
         if args.catalog_only:
             print(f"Catalog saved to {catalog_path}")
@@ -122,7 +125,7 @@ def main():
 
 
     print(f"Loading catalog from {catalog_path}...")
-    catalog = load_catalog(catalog_path)
+    catalog = load_catalog(catalog_subject, args.catalog)
 
     print("Filtering catalog...")
     filtered_catalog = filter_catalog(
@@ -142,8 +145,8 @@ def main():
 
     print(f"Selected {len(selected_catalog)} questions.")
 
-    question_pdf_path = generate_question_pdf(selected_catalog, questions_output_path)
-    answer_pdf_path = generate_answer_pdf(selected_catalog, answers_output_path)
+    question_pdf_path = generate_question_pdf(selected_catalog, questions_output_path, source_pdf_path=args.questions_source)
+    answer_pdf_path = generate_answer_pdf(selected_catalog, answers_output_path, source_pdf_path=args.answers_source)
 
     print("Done.")
     print(f"Questions PDF: {question_pdf_path}")

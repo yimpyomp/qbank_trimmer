@@ -7,7 +7,8 @@ from .extraction import (
     extract_skill,
     extract_metadata, clean_extracted_text, repair_difficulty)
 from pypdf import PdfReader
-from .config import CATALOG_PATH
+from .config import CATALOG_PATHS
+from pathlib import Path
 import json
 import pdfplumber
 from tqdm import tqdm
@@ -19,21 +20,22 @@ def catalog_questions(answer_pdf_path):
     question_catalog = {}
     combined_answers = read_file(answer_pdf_path)
     pages = combined_answers.pages
-
-    # Progress bar
-    total_pages = len(pages)
-
+    print(f"{len(pages)} pages to catalog")
     current_id = None
 
-    for i, page in enumerate(pages):
+    for i, page in enumerate(tqdm(pages, desc="Cataloging RW solutions")):
         page_number = i + 1
         text = page.extract_text() or ""
+        #print(text)
 
         question_id = extract_question_id(text)
+        #print(question_id)
 
         if question_id:
             current_id = question_id
             metadata = extract_metadata(text)
+
+            #print(f"Found ID {current_id} on page {page_number}")
 
             question_catalog[current_id] = {
                 "learning_area": metadata["learning_area"],
@@ -56,6 +58,8 @@ def catalog_questions(answer_pdf_path):
             ):
                 question_catalog[current_id]["answer"] = continuation_answer
 
+    print(f"{len((question_catalog))} results generated")
+
     return question_catalog
 
 
@@ -75,7 +79,7 @@ def catalog_blank(catalog, questions_pdf_path):
     blank_pages = PdfReader(questions_pdf_path).pages
     current_id = None
 
-    for i, page in enumerate(blank_pages):
+    for i, page in enumerate(tqdm(blank_pages, desc="Cataloging blank pages")):
         page_number = i + 1
         text = page.extract_text() or ""
 
@@ -103,15 +107,28 @@ def catalog_blank(catalog, questions_pdf_path):
         if current_id is not None and current_id in catalog:
             catalog[current_id]["blank_question_page"].append(page_number)
 
+    print(f"{len((catalog))} results generated")
+
     return catalog
 
 
-def save_catalog(catalog, output_path=CATALOG_PATH):
-    with open(output_path, "w") as f:
+def save_catalog(catalog, output_path):
+    output_path = Path(output_path)
+    output_path.parent.mkdir(exist_ok=True)
+
+    with open(output_path, "w", encoding="utf-8") as f:
         json.dump(catalog, f, indent=4)
 
+    print(f"Saved catalog to {output_path}")
 
-def load_catalog(catalog_path=CATALOG_PATH):
+
+def load_catalog(subject, catalog_path=None):
+    if not catalog_path:
+        if subject not in CATALOG_PATHS:
+            raise ValueError(f"Unknown subject: {subject}")
+
+        catalog_path = CATALOG_PATHS[subject]
+
     with open(catalog_path, "r") as f:
         return json.load(f)
 
@@ -237,3 +254,4 @@ def debug_this(entry, page_text, page_table):
         print(f"--------------------------------------------------------------------------------------------------\n"
               f"Null entry found\nPage Text:{page_text}\nPage Table: {page_table}\n"
               f"--------------------------------------------------------------------------------------------------\n")
+
