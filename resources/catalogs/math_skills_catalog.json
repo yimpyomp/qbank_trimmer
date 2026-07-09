@@ -1,0 +1,29 @@
+{
+    "Problem-Solving and Data Analysis": [
+        "Inference from sample statistics and margin of error",
+        "Ratios, rates, proportional relationships, and units",
+        "Probability and conditional probability",
+        "Percentages",
+        "One-variable data: Distributions and measures of center and spread",
+        "Two-variable data: Models and scatterplots",
+        "Evaluating statistical claims: Observational studies and experiments"
+    ],
+    "Algebra": [
+        "Linear functions",
+        "Linear equations in one variable",
+        "Systems of two linear equations in two variables",
+        "Linear inequalities in one or two variables",
+        "Linear equations in two variables"
+    ],
+    "Advanced Math": [
+        "Nonlinear functions",
+        "Nonlinear equations in one variable and systems of equations in two variables",
+        "Equivalent expressions"
+    ],
+    "Geometry and Trigonometry": [
+        "Lines, angles, and triangles",
+        "Area and volume",
+        "Right triangles and trigonometry",
+        "Circles"
+    ]
+}
