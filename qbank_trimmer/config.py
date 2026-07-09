@@ -5,7 +5,12 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 CATALOG_PATHS = {
     "rw": PROJECT_ROOT / "catalogs" / "rw_catalog.json",
-    "math": PROJECT_ROOT / "catalogs" / "math_catalog.json",
+    "math": PROJECT_ROOT / "catalogs" / "math_catalog.json"
+}
+
+SKILL_CATALOG_PATHS = {
+    "rw": PROJECT_ROOT / "catalogs" / "rw_skills_catalog.json",
+    "math": PROJECT_ROOT / "catalogs" / "math_skills_catalog.json"
 }
 
 RW_BANK_DIR = Path("bank")

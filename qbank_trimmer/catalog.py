@@ -7,7 +7,7 @@ from .extraction import (
     extract_skill,
     extract_metadata, clean_extracted_text, repair_difficulty)
 from pypdf import PdfReader
-from .config import CATALOG_PATHS
+from .config import CATALOG_PATHS, SKILL_CATALOG_PATHS
 from pathlib import Path
 import json
 import pdfplumber
@@ -131,6 +131,22 @@ def load_catalog(subject, catalog_path=None):
 
     with open(catalog_path, "r") as f:
         return json.load(f)
+
+
+# For use with GUI
+def load_skill_catalog(subject):
+    catalog_path = SKILL_CATALOG_PATHS[subject]
+
+    with open(catalog_path, "r") as f:
+        return json.load(f)
+
+
+def get_learning_areas(skill_catalog):
+    return list(skill_catalog.keys())
+
+
+def get_skills(skill_catalog, learning_area):
+    return skill_catalog.get(learning_area, [])
 
 
 def catalog_math_solutions_plumber(answer_pdf_path):
