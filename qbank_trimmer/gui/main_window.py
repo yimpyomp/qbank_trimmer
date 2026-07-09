@@ -230,6 +230,8 @@ class MainWindow(QMainWindow):
         self.worker.moveToThread(self.thread)
         self.thread.started.connect(self.worker.run)
 
+        self.worker.progress.connect(self.update_status)
+
         self.worker.finished.connect(self.generation_finished)
         self.worker.error.connect(self.generation_error)
 
@@ -262,3 +264,6 @@ class MainWindow(QMainWindow):
     def generation_started(self):
         self.status_label.setText("Generating questions...")
         self.button.setEnabled(False)
+
+    def update_status(self, message):
+        self.status_label.setText(message)
