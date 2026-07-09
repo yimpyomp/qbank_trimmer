@@ -1,6 +1,6 @@
 import pathlib
 from pypdf import PdfReader, PdfWriter
-from .config import COMBINED_QUESTIONS_PATH, COMBINED_SOLUTIONS_PATH
+from .config import RW_COMBINED_QUESTIONS_PATH, RW_COMBINED_SOLUTIONS_PATH
 
 
 def initial_config():
@@ -8,10 +8,10 @@ def initial_config():
     Check if combined question/answer files exist, create combined files if not
     :return:
     """
-    if not COMBINED_SOLUTIONS_PATH.exists():
+    if not RW_COMBINED_SOLUTIONS_PATH.exists():
         print("Combining solutions")
         combine_answers()
-    if not COMBINED_QUESTIONS_PATH.exists():
+    if not RW_COMBINED_QUESTIONS_PATH.exists():
         print("Combining questions")
         combine_questions()
     return None

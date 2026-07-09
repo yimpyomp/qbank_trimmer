@@ -10,8 +10,8 @@ def generate_questions(settings):
 
     selected_questions = select_questions(filtered_catalog, settings["count"])
 
-    generate_question_pdf(selected_questions, settings["questions_output"])
-    generate_answer_pdf(selected_questions, settings["answers_output"])
+    generate_question_pdf(selected_questions, settings["subject"], settings["questions_output"])
+    generate_answer_pdf(selected_questions, settings["subject"], settings["answers_output"])
 
 
 def create_catalog(settings):

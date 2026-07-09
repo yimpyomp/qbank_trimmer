@@ -13,16 +13,16 @@ SKILL_CATALOG_PATHS = {
     "math": PROJECT_ROOT / "catalogs" / "math_skills_catalog.json"
 }
 
-RW_BANK_DIR = Path("bank")
-RW_SOLUTIONS_DIR = Path("solns")
-MATH_BANK_DIR = RW_BANK_DIR / "math"
-MATH_SOLUTIONS_DIR = RW_SOLUTIONS_DIR / "math"
+BANK_DIR = Path("bank")
+SOLUTIONS_DIR = Path("solns")
+MATH_BANK_DIR = BANK_DIR / "math"
+MATH_SOLUTIONS_DIR = SOLUTIONS_DIR / "math"
 GENERATED_DIR = Path("generated")
 
-COMBINED_QUESTIONS_PATH = RW_BANK_DIR / "combined_questions.pdf"
-COMBINED_SOLUTIONS_PATH = RW_SOLUTIONS_DIR / "combined_answers.pdf"
-MATH_COMBINED_QUESTIONS_PATH = MATH_BANK_DIR / "math_combined_questions.pdf"
-MATH_COMBINED_SOLUTIONS_PATH = MATH_SOLUTIONS_DIR / "math_combined_solutions.pdf"
+RW_COMBINED_QUESTIONS_PATH = BANK_DIR / "rw_combined_questions.pdf"
+RW_COMBINED_SOLUTIONS_PATH = SOLUTIONS_DIR / "rw_combined_answers.pdf"
+MATH_COMBINED_QUESTIONS_PATH = BANK_DIR / "math_combined_questions.pdf"
+MATH_COMBINED_SOLUTIONS_PATH = SOLUTIONS_DIR / "math_combined_answers.pdf"
 
 
 CATALOG_REPORT_PATH = GENERATED_DIR / "catalog_blank_results.txt"

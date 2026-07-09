@@ -2,7 +2,11 @@ import random
 from pathlib import Path
 from pypdf import PdfReader, PdfWriter
 
-from .config import COMBINED_QUESTIONS_PATH, COMBINED_SOLUTIONS_PATH, GENERATED_DIR
+from .config import (RW_COMBINED_QUESTIONS_PATH,
+                     RW_COMBINED_SOLUTIONS_PATH,
+                     MATH_COMBINED_QUESTIONS_PATH,
+                     MATH_COMBINED_SOLUTIONS_PATH,
+                     GENERATED_DIR)
 
 
 def collect_blank_pages(catalog):
@@ -49,11 +53,12 @@ def write_pages_to_pdf(source_pdf_path, page_numbers, output_path):
     return output_path
 
 
-def generate_question_pdf(
-        catalog,
-        output_path=GENERATED_DIR / "selected_questions.pdf",
-        source_pdf_path=COMBINED_QUESTIONS_PATH,
-):
+def generate_question_pdf(catalog, subject, output_path=GENERATED_DIR / "selected_questions.pdf"):
+    if subject == "math":
+        source_pdf_path = MATH_COMBINED_QUESTIONS_PATH
+    else:
+        source_pdf_path = RW_COMBINED_QUESTIONS_PATH
+
     page_numbers = collect_blank_pages(catalog)
     return write_pages_to_pdf(
         source_pdf_path,
@@ -62,11 +67,12 @@ def generate_question_pdf(
     )
 
 
-def generate_answer_pdf(
-        catalog,
-        output_path=GENERATED_DIR / "selected_answers.pdf",
-        source_pdf_path=COMBINED_SOLUTIONS_PATH,
-):
+def generate_answer_pdf(catalog, subject, output_path=GENERATED_DIR / "selected_answers.pdf"):
+    if subject == "math":
+        source_pdf_path = MATH_COMBINED_SOLUTIONS_PATH
+    else:
+        source_pdf_path = RW_COMBINED_SOLUTIONS_PATH
+
     page_numbers = collect_answer_pages(catalog)
     return write_pages_to_pdf(
         source_pdf_path,

@@ -216,8 +216,11 @@ class MainWindow(QMainWindow):
 
 
     def button_clicked(self):
-        settings = self.get_settings()
-        generate_questions(settings)
+        try:
+            settings = self.get_settings()
+            generate_questions(settings)
+        except Exception as e:
+            print(e)
 
 
 
