@@ -1,4 +1,4 @@
 /debug
-/bank
-/solns
+/resources/bank/*
+/resources/solns/*
 /generated/*
