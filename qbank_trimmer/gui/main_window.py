@@ -1,5 +1,6 @@
 from qbank_trimmer.catalog import load_skill_catalog
 from qbank_trimmer.gui.worker import GenerationWorker
+from qbank_trimmer.config import GENERATED_DIR
 from PySide6.QtWidgets import (QWidget,
                                QMainWindow,
                                QLabel,
@@ -10,8 +11,13 @@ from PySide6.QtWidgets import (QWidget,
                                QRadioButton,
                                QGroupBox,
                                QCheckBox,
-                               QComboBox)
+                               QComboBox,
+                               QMessageBox,
+                               QFileDialog)
 from PySide6.QtCore import QThread
+from pathlib import Path
+
+from qbank_trimmer.utils import create_output_directory
 
 
 class MainWindow(QMainWindow):
@@ -53,6 +59,7 @@ class MainWindow(QMainWindow):
         self.build_difficulty_group()
         self.build_question_selector()
 
+        self.build_output_selector()
         # Keep this as the last thing
         self.build_generate_button()
         self.build_status_label()
@@ -140,6 +147,24 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.skill_dropdown_label)
         self.layout.addWidget(self.skill_dropdown)
 
+    def build_output_selector(self):
+        self.output_label = QLabel("Output Folder")
+
+        self.output_path = QLabel("Default")
+
+        self.output_button = QPushButton("Browse")
+
+        self.layout.addWidget(self.output_label)
+        self.layout.addWidget(self.output_path)
+        self.layout.addWidget(self.output_button)
+
+    def choose_output_folder(self):
+        folder = QFileDialog.getExistingDirectory(self, "Select Output Folder")
+
+        if folder:
+            self.output_directory = Path(folder)
+            self.output_path.setText(folder)
+
     def setup_connections(self):
         # Generate button
         self.button.clicked.connect(self.button_clicked)
@@ -151,6 +176,8 @@ class MainWindow(QMainWindow):
         self.math_button.clicked.connect(self.update_skill_catalog)
 
         self.learning_area.currentTextChanged.connect(self.update_skills)
+
+        self.output_button.clicked.connect(self.choose_output_folder)
 
 
     def update_learning_areas(self):
@@ -216,10 +243,11 @@ class MainWindow(QMainWindow):
                 "skill": skill,
                 "count": question_count,
                 "catalog_path": None,
-                "questions_output_path": None,
-                "answers_output_path": None}
+                "questions_output_path": self.output_directory / "selected_questions.pdf",
+                "answers_output_path": self.output_directory / "selected_answers.pdf"}
 
     def start_generation(self):
+        self.output_directory = create_output_directory(GENERATED_DIR)
         settings = self.get_settings()
 
         self.generation_started()
@@ -251,15 +279,18 @@ class MainWindow(QMainWindow):
             self.start_generation()
 
         except Exception as e:
-            print(e)
+            self.generation_error(e)
 
     def generation_finished(self):
         self.status_label.setText("Done!")
         self.button.setEnabled(True)
 
     def generation_error(self, message):
-        self.status_label.setText(f"Error: {message}")
         self.button.setEnabled(True)
+        self.status_label.setText("Generation failed")
+
+        QMessageBox.critical(self, "Generation Error", message)
+
 
     def generation_started(self):
         self.status_label.setText("Generating questions...")
@@ -267,3 +298,12 @@ class MainWindow(QMainWindow):
 
     def update_status(self, message):
         self.status_label.setText(message)
+
+    def choose_output_folder(self):
+        folder = QFileDialog.getExistingDirectory(
+            self,
+            "Select Output Folder"
+        )
+        if folder:
+            self.output_directory = Path(folder)
+            self.output_path_label.setText(folder)

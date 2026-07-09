@@ -1,23 +1,47 @@
 from pathlib import Path
+import sys
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+def get_app_dir():
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).parent
+    else:
+        return Path(__file__).resolve().parent.parent
+
+
+def validate_resources():
+    required_files = [
+        CATALOG_PATHS["rw"],
+        CATALOG_PATHS["math"],
+        RW_COMBINED_QUESTIONS_PATH,
+        MATH_COMBINED_QUESTIONS_PATH,
+        RW_COMBINED_SOLUTIONS_PATH,
+        MATH_COMBINED_SOLUTIONS_PATH
+    ]
+
+    missing = [
+        str(path) for path in required_files if not path.exists()
+    ]
+
+    return missing
+
+
+APP_DIR = get_app_dir()
 
 CATALOG_PATHS = {
-    "rw": PROJECT_ROOT / "catalogs" / "rw_catalog.json",
-    "math": PROJECT_ROOT / "catalogs" / "math_catalog.json"
+    "rw": APP_DIR / "resources" /  "catalogs" / "rw_catalog.json",
+    "math": APP_DIR / "resources" /  "catalogs" / "math_catalog.json"
 }
 
 SKILL_CATALOG_PATHS = {
-    "rw": PROJECT_ROOT / "catalogs" / "rw_skills_catalog.json",
-    "math": PROJECT_ROOT / "catalogs" / "math_skills_catalog.json"
+    "rw": APP_DIR / "resources" /  "catalogs" / "rw_skills_catalog.json",
+    "math": APP_DIR / "resources" /  "catalogs" / "math_skills_catalog.json"
 }
 
-BANK_DIR = PROJECT_ROOT / "bank"
-SOLUTIONS_DIR = PROJECT_ROOT / "solns"
-MATH_BANK_DIR = BANK_DIR / "math"
-MATH_SOLUTIONS_DIR = SOLUTIONS_DIR / "math"
-GENERATED_DIR = PROJECT_ROOT / "generated"
+BANK_DIR = APP_DIR / "resources" / "bank"
+SOLUTIONS_DIR = APP_DIR / "resources" /  "solns"
+GENERATED_DIR = APP_DIR / "generated"
+GENERATED_DIR.mkdir(exist_ok=True)
 
 RW_COMBINED_QUESTIONS_PATH = BANK_DIR / "rw_combined_questions.pdf"
 RW_COMBINED_SOLUTIONS_PATH = SOLUTIONS_DIR / "rw_combined_answers.pdf"
