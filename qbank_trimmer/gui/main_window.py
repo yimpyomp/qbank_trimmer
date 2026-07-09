@@ -1,8 +1,6 @@
 from qbank_trimmer.catalog import load_skill_catalog
 from qbank_trimmer.gui.worker import GenerationWorker
-
-from PySide6.QtWidgets import (QApplication,
-                               QWidget,
+from PySide6.QtWidgets import (QWidget,
                                QMainWindow,
                                QLabel,
                                QPushButton,
@@ -13,6 +11,8 @@ from PySide6.QtWidgets import (QApplication,
                                QGroupBox,
                                QCheckBox,
                                QComboBox)
+from PySide6.QtCore import QThread
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -219,12 +219,46 @@ class MainWindow(QMainWindow):
                 "questions_output_path": None,
                 "answers_output_path": None}
 
+    def start_generation(self):
+        settings = self.get_settings()
+
+        self.generation_started()
+
+        self.thread = QThread()
+        self.worker = GenerationWorker(settings)
+
+        self.worker.moveToThread(self.thread)
+        self.thread.started.connect(self.worker.run)
+
+        self.worker.finished.connect(self.generation_finished)
+        self.worker.error.connect(self.generation_error)
+
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.error.connect(self.thread.quit)
+
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.worker.error.connect(self.worker.deleteLater)
+
+        self.thread.finished.connect(self.thread.deleteLater)
+
+        self.thread.start()
+
 
     def button_clicked(self):
         try:
-            settings = self.get_settings()
-            worker = GenerationWorker(settings)
-            worker.run()
+            self.start_generation()
 
         except Exception as e:
             print(e)
+
+    def generation_finished(self):
+        self.status_label.setText("Done!")
+        self.button.setEnabled(True)
+
+    def generation_error(self, message):
+        self.status_label.setText(f"Error: {message}")
+        self.button.setEnabled(True)
+
+    def generation_started(self):
+        self.status_label.setText("Generating questions...")
+        self.button.setEnabled(False)
