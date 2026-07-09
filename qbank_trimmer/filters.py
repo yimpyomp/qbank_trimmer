@@ -10,7 +10,8 @@ def normalize_filter_text(text):
 def filter_catalog(catalog, learning_area=None, skill=None, difficulty=None):
     learning_area = normalize_filter_text(learning_area)
     skill = normalize_filter_text(skill)
-    difficulty = normalize_filter_text(difficulty)
+    if not isinstance(difficulty, list):
+        difficulty = normalize_filter_text(difficulty)
 
     # New dictionary to store results
     filtered_catalog = {}
@@ -20,8 +21,13 @@ def filter_catalog(catalog, learning_area=None, skill=None, difficulty=None):
         question_learning_area = normalize_filter_text(question_data["learning_area"])
         question_skill = normalize_filter_text(question_data["skill"])
 
-        if difficulty is not None and question_difficulty != difficulty:
-            continue
+        if difficulty:
+            if isinstance(difficulty, list):
+                if question_difficulty not in difficulty:
+                    continue
+            else:
+                if question_difficulty != difficulty:
+                    continue
 
         if learning_area is not None and question_learning_area != learning_area:
             continue
