@@ -2,3 +2,5 @@
 /resources/bank/*
 /resources/solns/*
 /generated/*
+.idea/
+.venv/
