@@ -1,5 +1,8 @@
 from qbank_trimmer.catalog import load_skill_catalog
 from app import generate_questions
+import inspect
+
+print(inspect.getfile(generate_questions))
 
 from PySide6.QtWidgets import (QApplication,
                                QWidget,
@@ -218,7 +221,9 @@ class MainWindow(QMainWindow):
     def button_clicked(self):
         try:
             settings = self.get_settings()
+            print(settings)
             generate_questions(settings)
+            print("Done")
         except Exception as e:
             print(e)
 

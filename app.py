@@ -6,10 +6,13 @@ from qbank_trimmer.generation import generate_question_pdf, generate_answer_pdf
 def generate_questions(settings):
     catalog = load_catalog(settings["subject"], settings.get("catalog_path"))
 
+    print("Filtering catalog")
     filtered_catalog = filter_catalog(catalog, settings["learning_area"], settings["skill"], settings["difficulty"])
 
+    print("Selecting questions")
     selected_questions = select_questions(filtered_catalog, settings["count"])
 
+    print("Creating files")
     generate_question_pdf(selected_questions, settings["subject"], settings["questions_output"])
     generate_answer_pdf(selected_questions, settings["subject"], settings["answers_output"])
 

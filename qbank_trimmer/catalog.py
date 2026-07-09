@@ -130,7 +130,9 @@ def load_catalog(subject, catalog_path=None):
         catalog_path = CATALOG_PATHS[subject]
 
     with open(catalog_path, "r") as f:
-        return json.load(f)
+        catalog = json.load(f)
+
+    return clean_catalog(catalog)
 
 
 # For use with GUI
@@ -271,3 +273,11 @@ def debug_this(entry, page_text, page_table):
               f"Null entry found\nPage Text:{page_text}\nPage Table: {page_table}\n"
               f"--------------------------------------------------------------------------------------------------\n")
 
+
+def clean_catalog(catalog):
+    for entry in catalog.values():
+        for key, value in entry.items():
+            if isinstance(value, str):
+                entry[key] = value.strip()
+
+    return catalog
