@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
-from qbank_trimmer.config import CATALOG_PATHS, GENERATED_DIR
-from app import generate_questions, create_catalog
+from qbank_trimmer.config import GENERATED_DIR
+from qbank_trimmer.app import generate_questions, create_catalog
 
 
 def parse_arguments():

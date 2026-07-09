@@ -1,5 +1,5 @@
 from qbank_trimmer.catalog import load_skill_catalog
-from app import generate_questions
+from qbank_trimmer.gui.worker import GenerationWorker
 
 from PySide6.QtWidgets import (QApplication,
                                QWidget,
@@ -55,6 +55,7 @@ class MainWindow(QMainWindow):
 
         # Keep this as the last thing
         self.build_generate_button()
+        self.build_status_label()
 
         self.update_skill_catalog()
 
@@ -117,6 +118,10 @@ class MainWindow(QMainWindow):
     def build_generate_button(self):
         self.button = QPushButton("Generate")
         self.layout.addWidget(self.button)
+
+    def build_status_label(self):
+        self.status_label = QLabel("Ready")
+        self.layout.addWidget(self.status_label)
 
     def build_learning_area_selector(self):
         self.learning_area_label = QLabel("Learning Area")
@@ -218,18 +223,8 @@ class MainWindow(QMainWindow):
     def button_clicked(self):
         try:
             settings = self.get_settings()
-            print(settings)
-            generate_questions(settings)
+            worker = GenerationWorker(settings)
+            worker.run()
+
         except Exception as e:
             print(e)
-
-
-
-
-
-app = QApplication([])
-
-window = MainWindow()
-window.show()
-
-app.exec()
