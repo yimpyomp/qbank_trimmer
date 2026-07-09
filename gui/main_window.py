@@ -1,8 +1,5 @@
 from qbank_trimmer.catalog import load_skill_catalog
 from app import generate_questions
-import inspect
-
-print(inspect.getfile(generate_questions))
 
 from PySide6.QtWidgets import (QApplication,
                                QWidget,
@@ -188,13 +185,13 @@ class MainWindow(QMainWindow):
         difficulties = []
 
         if self.easy_button.isChecked():
-            difficulties.append("Easy")
+            difficulties.append("easy")
 
         if self.medium_button.isChecked():
-            difficulties.append("Medium")
+            difficulties.append("medium")
 
         if self.hard_button.isChecked():
-            difficulties.append("Hard")
+            difficulties.append("hard")
 
         return difficulties
 
@@ -223,7 +220,6 @@ class MainWindow(QMainWindow):
             settings = self.get_settings()
             print(settings)
             generate_questions(settings)
-            print("Done")
         except Exception as e:
             print(e)
 

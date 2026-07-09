@@ -12,6 +12,8 @@ def filter_catalog(catalog, learning_area=None, skill=None, difficulty=None):
     skill = normalize_filter_text(skill)
     if not isinstance(difficulty, list):
         difficulty = normalize_filter_text(difficulty)
+    else:
+        difficulty = [normalize_filter_text(item) for item in difficulty]
 
     # New dictionary to store results
     filtered_catalog = {}

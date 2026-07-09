@@ -13,11 +13,11 @@ SKILL_CATALOG_PATHS = {
     "math": PROJECT_ROOT / "catalogs" / "math_skills_catalog.json"
 }
 
-BANK_DIR = Path("bank")
-SOLUTIONS_DIR = Path("solns")
+BANK_DIR = PROJECT_ROOT / "bank"
+SOLUTIONS_DIR = PROJECT_ROOT / "solns"
 MATH_BANK_DIR = BANK_DIR / "math"
 MATH_SOLUTIONS_DIR = SOLUTIONS_DIR / "math"
-GENERATED_DIR = Path("generated")
+GENERATED_DIR = PROJECT_ROOT / "generated"
 
 RW_COMBINED_QUESTIONS_PATH = BANK_DIR / "rw_combined_questions.pdf"
 RW_COMBINED_SOLUTIONS_PATH = SOLUTIONS_DIR / "rw_combined_answers.pdf"

@@ -13,8 +13,15 @@ def generate_questions(settings):
     selected_questions = select_questions(filtered_catalog, settings["count"])
 
     print("Creating files")
-    generate_question_pdf(selected_questions, settings["subject"], settings["questions_output"])
-    generate_answer_pdf(selected_questions, settings["subject"], settings["answers_output"])
+    if not settings["questions_output_path"]:
+        generate_question_pdf(selected_questions, settings["subject"])
+    else:
+        generate_question_pdf(selected_questions, settings["subject"], settings["questions_output_path"])
+    if not settings["answers_output_path"]:
+        generate_answer_pdf(selected_questions, settings["subject"])
+    else:
+        generate_answer_pdf(selected_questions, settings["subject"], settings["answers_output_path"])
+    print("Done")
 
 
 def create_catalog(settings):
