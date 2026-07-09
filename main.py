@@ -1,9 +1,7 @@
 import argparse
 from pathlib import Path
-from qbank_trimmer.catalog import generate_catalog, save_catalog, catalog_blank, load_catalog
-from qbank_trimmer.generation import generate_question_pdf, generate_answer_pdf
-from qbank_trimmer.filters import filter_catalog, select_questions
 from qbank_trimmer.config import CATALOG_PATHS, GENERATED_DIR
+from app import generate_questions, create_catalog
 
 
 def parse_arguments():
@@ -47,7 +45,7 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        "--catalog",
+        "--catalog-path",
         help="Optional override path to a saved catalog.json."
     )
 
@@ -100,57 +98,30 @@ def parse_arguments():
 def main():
     args = parse_arguments()
 
-    catalog_subject = args.subject
-    catalog_path = Path(args.catalog) if args.catalog else CATALOG_PATHS[catalog_subject]
-    questions_output_path = Path(args.questions_output)
-    answers_output_path = Path(args.answers_output)
-    catalog_subject = args.subject
+    settings = {"subject": args.subject,
+                "count": args.count,
+                "difficulty": args.difficulty,
+                "learning_area": args.learning_area,
+                "skill": args.skill,
+
+                "catalog_path": args.catalog_path,
+
+                "questions_output": Path(args.questions_output),
+                "answers_output": Path(args.answers_output)
+                }
 
     if args.generate_catalog:
-        print(f"Generating catalog at {catalog_path}...")
-        catalog = generate_catalog(
-            Path(args.answers_source),
-            Path(args.questions_source),
-            catalog_subject
-        )
-        print("Cataloging complete")
-        print(catalog)
-        print("Saving catalog")
-        save_catalog(catalog, output_path=catalog_path)
-        print("Catalog save complete")
+        print(f"Generating catalog...")
+        catalog_file = create_catalog(settings)
+
+        print(f"Catalog saved to {catalog_file}")
 
         if args.catalog_only:
-            print(f"Catalog saved to {catalog_path}")
             return
 
-
-    print(f"Loading catalog from {catalog_path}...")
-    catalog = load_catalog(catalog_subject, args.catalog)
-
-    print("Filtering catalog...")
-    filtered_catalog = filter_catalog(
-        catalog,
-        difficulty=args.difficulty,
-        learning_area=args.learning_area,
-        skill=args.skill,
-    )
-
-    print(f"Found {len(filtered_catalog)} matching questions.")
-
-    selected_catalog = select_questions(
-        filtered_catalog,
-        number_of_questions=args.count,
-        randomize=not args.no_random,
-    )
-
-    print(f"Selected {len(selected_catalog)} questions.")
-
-    question_pdf_path = generate_question_pdf(selected_catalog, questions_output_path, source_pdf_path=args.questions_source)
-    answer_pdf_path = generate_answer_pdf(selected_catalog, answers_output_path, source_pdf_path=args.answers_source)
-
-    print("Done.")
-    print(f"Questions PDF: {question_pdf_path}")
-    print(f"Answers PDF: {answer_pdf_path}")
+    print("Generating questions...")
+    generate_questions(settings)
+    print("Done")
 
 
 if __name__ == "__main__":

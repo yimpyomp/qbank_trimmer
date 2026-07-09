@@ -1,4 +1,6 @@
-from qbank_trimmer.catalog import load_skill_catalog, get_learning_areas, get_skills
+from qbank_trimmer.catalog import load_skill_catalog
+from app import generate_questions
+
 from PySide6.QtWidgets import (QApplication,
                                QWidget,
                                QMainWindow,
@@ -207,12 +209,16 @@ class MainWindow(QMainWindow):
                 "difficulty": difficulties,
                 "learning_area": self.learning_area.currentText(),
                 "skill": skill,
-                "count": question_count}
+                "count": question_count,
+                "catalog_path": None,
+                "questions_output_path": None,
+                "answers_output_path": None}
 
 
     def button_clicked(self):
         settings = self.get_settings()
-        print(settings)
+        generate_questions(settings)
+
 
 
 
