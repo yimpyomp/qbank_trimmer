@@ -13,7 +13,7 @@ Current Version: 1.0.0
   * Difficulty
   * Skill
 * Generates custom practice sets
-* Both GUI and CLI are supported
+* Provides both graphical and command line interfaces
   * Some advanced features like catalog generation and PDF consolidation are CLI only. Do not attempt to use these unless you're familiar and comfortable programming
 
 ## Known Issues
