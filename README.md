@@ -1,5 +1,3 @@
-# This is a work in progress. Compatibility has only been verified on a personal linux machine
-
 ## Question Bank Trimmer: Generate custom DSAT practice sets
 ## Current Version: 1.0.0
 
@@ -12,16 +10,16 @@
   * Difficulty
   * Skill
 * Generates custom practice sets
-* Supports command-line usage
-  * GUI in development
+* Both GUI and CLI are supported
+  * Some advanced features like catalog generation and PDF consolidation are CLI only. Do not attempt to use these unless you're familiar and comforable with programming
 
-## Known Issues
+## Known Issuest
 * RW cataloging functionality is unreliable
 
 ## Obtaining the necessary files
 * All necessary files for generating custom question sets are included
 
-### Basic usage:
+### Basic usage (CLI/From source only):
 1. Ensure *Python 3.10.9 or greater* is installed on your machine.
     * The Windows installer can be found [here](https://www.python.org/downloads/release/python-3109/)
     * When installing, ensure that you select the option to add Python to PATH on the initial splash screen.
@@ -37,7 +35,7 @@
             * pip install -r requirements.txt\
 4. Run the program
 
-### Example usage:
+### Example usage (CLI Only):
 * To generate a custom PDF of 10 math questions:
   * Windows:
     * .\main.py -s math -c 10 --questions-source bank\math_combined_questions.pdf --answers-source solns\math_combined_answers.pdf
