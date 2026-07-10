@@ -8,6 +8,9 @@
 # Generated files
 /generated/
 
+# Release directory
+/release/
+
 # IDE Files
 .idea/
 
