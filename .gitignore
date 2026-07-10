@@ -1,6 +1,27 @@
-/debug
-/resources/bank/*
-/resources/solns/*
-/generated/*
+# Debug files
+/debug/
+
+# Large resources, distributed separately
+/resources/bank/
+/resources/solns/
+
+# Generated files
+/generated/
+
+# IDE Files
 .idea/
+
+# Virtual environment
 .venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# PyInstaller output
+build/
+dist/
+
+# OS files
+.DS_Store
+Thumbs.db
