@@ -1,5 +1,8 @@
-## Question Bank Trimmer: Generate custom DSAT practice sets
-## Current Version: 1.0.0
+# Question Bank Trimmer
+
+Generate custom DSAT practice sets from official question banks
+
+Current Version: 1.0.0
 
 ## Features
 * Extracts questions and answers from PDF question banks
@@ -11,15 +14,42 @@
   * Skill
 * Generates custom practice sets
 * Both GUI and CLI are supported
-  * Some advanced features like catalog generation and PDF consolidation are CLI only. Do not attempt to use these unless you're familiar and comforable with programming
+  * Some advanced features like catalog generation and PDF consolidation are CLI only. Do not attempt to use these unless you're familiar and comfortable programming
 
-## Known Issuest
+## Known Issues
 * RW cataloging functionality is unreliable
 
-## Obtaining the necessary files
-* All necessary files for generating custom question sets are included
+## Download
 
-### Basic usage (CLI/From source only):
+Prebuilt versions are available in the Releases section.
+
+Download the archive matching your operating system:
+- Windows
+- Linux
+- macOS
+
+## Installation (Prebuilt Application)
+1. Download the latest release for your operating system.
+2. Extract the archive.
+3. Run SATQuestionBankTrimmer.
+
+The included resources folder contains required question banks and catalogs. Do not move or rename this folder.
+
+No Python installation is required.
+
+## Usage (GUI)
+1. Select the desired question category.
+2. Apply filters.
+3. Generate a practice set.
+4. Review the generated PDF output.
+
+## Troubleshooting
+If the application fails to start:
+- Make sure the entire folder was extracted.
+- Do not move the executable away from the _internal folder.
+- Ensure the resources folder is present.
+
+### CLI Usage
 1. Ensure *Python 3.10.9 or greater* is installed on your machine.
     * The Windows installer can be found [here](https://www.python.org/downloads/release/python-3109/)
     * When installing, ensure that you select the option to add Python to PATH on the initial splash screen.
