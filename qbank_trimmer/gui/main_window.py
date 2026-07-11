@@ -33,6 +33,9 @@ class MainWindow(QMainWindow):
         # Setup for having skills in dropdowns
         self.skill_catalog = {}
 
+        # Initializing output folder, none = default location
+        self.output_directory = None
+
         self.setWindowTitle("SAT Question Generator")
 
         self.setup_ui()
@@ -239,7 +242,8 @@ class MainWindow(QMainWindow):
                 "answers_output_path": self.output_directory / "selected_answers.pdf"}
 
     def start_generation(self):
-        self.output_directory = create_output_directory(GENERATED_DIR)
+        if not self.output_directory:
+            self.output_directory = create_output_directory(GENERATED_DIR)
         settings = self.get_settings()
 
         self.generation_started()
