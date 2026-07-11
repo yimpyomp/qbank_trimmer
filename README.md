@@ -2,7 +2,7 @@
 
 Generate custom DSAT practice sets from official question banks
 
-Current Version: 1.0.0
+Current Version: eMFgenV1.0.0
 
 ## Features
 * Extracts questions and answers from PDF question banks
@@ -60,7 +60,7 @@ If the application fails to start:
     * For Windows:
         * Open PowerShell. You can find it by using: Windows Key > PowerShell
         * Navigate to directory containing the scripts. This is done using the command 'cd'. Tab can be used to autocomplete directories, directories are separated by '\'.
-        * Example usage for scripts saved to desktop directory DSAT_trimmer:
+        * Example usage for scripts saved to desktop directory qbank_trimmer:
             * cd .\Desktop\qbank_trimmer
             * pip install -r requirements.txt\
 4. Run the program
@@ -70,3 +70,9 @@ If the application fails to start:
   * Windows:
     * .\main.py -s math -c 10 --questions-source bank\math_combined_questions.pdf --answers-source solns\math_combined_answers.pdf
   * Two PDFs will be generated in the generated directory, one containing only the questions and another with the relevant solution pages
+
+### Planned updates
+* Add mac support
+  * If you would like to use the program and you're on mac, contact me or submit a pull request
+* Add support for generating sets from multiple learning areas/skills
+* Add support for generating practice 'tests' following the same learning area distributions
