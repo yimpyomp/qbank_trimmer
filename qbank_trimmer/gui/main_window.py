@@ -52,7 +52,6 @@ class MainWindow(QMainWindow):
         self.build_subject_group()
 
         self.build_learning_area_selector()
-        # self.update_learning_areas()
 
         self.build_skill_selector()
 
