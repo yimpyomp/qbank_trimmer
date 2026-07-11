@@ -38,9 +38,6 @@ class MainWindow(QMainWindow):
         self.setup_ui()
         self.setup_connections()
 
-
-
-
     def setup_ui(self):
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
@@ -64,7 +61,6 @@ class MainWindow(QMainWindow):
         self.build_status_label()
 
         self.update_skill_catalog()
-
 
     def build_title(self):
         self.title = QLabel("SAT Question Generator")
@@ -90,7 +86,6 @@ class MainWindow(QMainWindow):
         subject_layout.addWidget(self.math_button)
 
         self.layout.addWidget(self.subject_group)
-
 
     def build_difficulty_group(self):
         # Create difficulty group
@@ -178,7 +173,6 @@ class MainWindow(QMainWindow):
 
         self.output_button.clicked.connect(self.choose_output_folder)
 
-
     def update_learning_areas(self):
         if self.rw_button.isChecked():
             subject = "rw"
@@ -226,7 +220,6 @@ class MainWindow(QMainWindow):
 
         return difficulties
 
-
     def get_settings(self):
         difficulties = self.get_difficulties()
 
@@ -272,7 +265,6 @@ class MainWindow(QMainWindow):
 
         self.thread.start()
 
-
     def button_clicked(self):
         try:
             self.start_generation()
@@ -289,7 +281,6 @@ class MainWindow(QMainWindow):
         self.status_label.setText("Generation failed")
 
         QMessageBox.critical(self, "Generation Error", message)
-
 
     def generation_started(self):
         self.status_label.setText("Generating questions...")
