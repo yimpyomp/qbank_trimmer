@@ -159,7 +159,7 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.output_button)
 
     def choose_output_folder(self):
-        folder = QFileDialog.getExistingDirectory(self, "Select Output Folder")
+        folder = QFileDialog.getExistingDirectory(self, "Select Output Folder: ")
 
         if folder:
             self.output_directory = Path(folder)
@@ -299,11 +299,3 @@ class MainWindow(QMainWindow):
     def update_status(self, message):
         self.status_label.setText(message)
 
-    def choose_output_folder(self):
-        folder = QFileDialog.getExistingDirectory(
-            self,
-            "Select Output Folder"
-        )
-        if folder:
-            self.output_directory = Path(folder)
-            self.output_path_label.setText(folder)
