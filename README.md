@@ -72,7 +72,5 @@ If the application fails to start:
   * Two PDFs will be generated in the generated directory, one containing only the questions and another with the relevant solution pages
 
 ### Planned updates
-* Add mac support
-  * If you would like to use the program and you're on mac, contact me or submit a pull request
 * Add support for generating sets from multiple learning areas/skills
 * Add support for generating practice 'tests' following the same learning area distributions
