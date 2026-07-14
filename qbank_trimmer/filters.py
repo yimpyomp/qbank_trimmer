@@ -53,7 +53,7 @@ def select_questions(catalog, number_of_questions, randomize=True):
     if randomize:
         if number_of_questions > len(catalog):
             raise ValueError(
-                f"Only {len(catalog)} questions match your filters.")
+                f"Only {len(catalog)} questions match your filters. Try reducing the count.")
         selected_ids = random.sample(question_ids, number_of_questions)
     else:
         selected_ids = question_ids[:number_of_questions]

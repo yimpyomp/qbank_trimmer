@@ -35,8 +35,6 @@ def catalog_questions(answer_pdf_path):
             current_id = question_id
             metadata = extract_metadata(text)
 
-            #print(f"Found ID {current_id} on page {page_number}")
-
             question_catalog[current_id] = {
                 "learning_area": metadata["learning_area"],
                 "skill": metadata["skill"],
