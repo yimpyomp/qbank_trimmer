@@ -6,10 +6,21 @@ on:
       - "v*"
   workflow_dispatch:
 
-
 jobs:
-  windows:
-    runs-on: windows-latest
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            artifact: windows-build
+
+          - os: macos-13
+            artifact: macos-intel-build
+
+          - os: macos-latest
+            artifact: macos-arm-build
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
@@ -32,36 +43,5 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-build
+          name: ${{ matrix.artifact }}
           path: dist/
-
-
-  macos:
-    runs-on: macos-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.10"
-
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
-          pip install pyinstaller
-
-      - name: Build
-        run: |
-          pyinstaller SATQuestionBankTrimmer.spec
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: macos-build
-          path: dist/
-
-
-
