@@ -33,6 +33,18 @@ Download the archive matching your operating system:
 2. Extract the archive.
 3. Run SATQuestionBankTrimmer.
 
+## Installation from source
+** This section is primarily directed at Intel based Macs.
+1. Ensure you have Python 3.10 installed on your system
+2. From the terminal, navigate to the folder containing the trimmer's source code
+3. Run the following commands:
+ - pip install -r requirements.txt
+ - pip install pyinstaller
+ - pyinstaller SATQuestionBankTrimmer.spec
+4. Step three will result in two folders, build and dist. Build may be discarded.
+5. Obtain the necessary files placed within the resources directory and copy the entire directory next to _internal and the app itself
+ - Required resources may be obtained from any of the builds for the latest release. The resources are platform independent
+
 The included resources folder contains required question banks and catalogs. Do not move or rename this folder.
 
 No Python installation is required.
