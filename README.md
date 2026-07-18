@@ -2,7 +2,7 @@
 
 Generate custom DSAT practice sets from official question banks
 
-Current Version: eMFgenV1.0.3
+Current Version: eMFgenV1.1.0
 
 ## Features
 * Extracts questions and answers from PDF question banks
@@ -86,3 +86,7 @@ If the application fails to start:
 ### Planned updates
 * Add support for generating sets from multiple learning areas/skills
 * Add support for generating practice 'tests' following the same learning area distributions
+
+### Bugs and Feature Requests
+- Please open an issue on Github if you encounter any bugs or if you have a feature request suggestion
+- PRs and contributions are welcome
