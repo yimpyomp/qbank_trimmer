@@ -279,3 +279,26 @@ def clean_catalog(catalog):
                 entry[key] = value.strip()
 
     return catalog
+
+
+def lookup_id(catalog, question_id):
+    question = catalog.get(question_id.lower())
+
+    if question is None:
+        raise ValueError(f"Question ID {question_id} not found!")
+
+    key_pages = question["answer_key_page"]
+    if len(key_pages) > 1:
+        key_pages = f"{key_pages[0] + 1}-{key_pages[-1] + 1}"
+    else:
+        key_pages = str(key_pages[0] + 1)
+
+    blank_pages = question["blank_question_page"]
+    if len(blank_pages) > 1:
+        blank_pages = f"{blank_pages[0] + 1}-{blank_pages[-1] + 1}"
+    else:
+        blank_pages = str(blank_pages[0] + 1)
+
+    return {"answer": question["answer"],
+            "key_page": key_pages,
+            "blank_page": blank_pages}

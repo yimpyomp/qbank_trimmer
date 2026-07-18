@@ -1,4 +1,4 @@
-from qbank_trimmer.catalog import load_skill_catalog
+from qbank_trimmer.catalog import load_skill_catalog, lookup_id, load_catalog
 from qbank_trimmer.gui.worker import GenerationWorker
 from qbank_trimmer.config import GENERATED_DIR
 from PySide6.QtWidgets import (QWidget,
@@ -13,7 +13,9 @@ from PySide6.QtWidgets import (QWidget,
                                QCheckBox,
                                QComboBox,
                                QMessageBox,
-                               QFileDialog)
+                               QFileDialog,
+                               QTabWidget,
+                               QLineEdit)
 from PySide6.QtCore import QThread
 from pathlib import Path
 
@@ -33,6 +35,8 @@ class MainWindow(QMainWindow):
         # Setup for having skills in dropdowns
         self.skill_catalog = {}
 
+        self.question_catalogs = {}
+
         # Initializing output folder, none = default location
         self.output_directory = None
 
@@ -49,21 +53,65 @@ class MainWindow(QMainWindow):
         self.central_widget.setLayout(self.layout)
 
         self.build_title()
-        self.build_subject_group()
 
-        self.build_learning_area_selector()
+        # Adding new code for tabs
+        self.tabs = QTabWidget()
+        self.layout.addWidget(self.tabs)
 
-        self.build_skill_selector()
+        self.build_generate_tab()
+        self.build_lookup_tab()
 
-        self.build_difficulty_group()
-        self.build_question_selector()
-
-        self.build_output_selector()
-        # Keep this as the last thing
-        self.build_generate_button()
-        self.build_status_label()
+        self.build_status_label()   # shared, sits below the tabs
 
         self.update_skill_catalog()
+
+    def build_generate_tab(self):
+        generate_tab = QWidget()
+        self.generate_layout = QVBoxLayout()
+        generate_tab.setLayout(self.generate_layout)
+
+        self.build_subject_group()
+        self.build_learning_area_selector()
+        self.build_skill_selector()
+        self.build_difficulty_group()
+        self.build_question_selector()
+        self.build_output_selector()
+        self.build_generate_button()
+
+        self.tabs.addTab(generate_tab, "Generate Questions")
+
+    def build_lookup_tab(self):
+        lookup_tab = QWidget()
+        self.lookup_layout = QVBoxLayout()
+        lookup_tab.setLayout(self.lookup_layout)
+
+        # Add subject selector
+        self.lookup_subject_group = QGroupBox("Subject")
+        self.lookup_math_button = QRadioButton("Math")
+        self.lookup_rw_button = QRadioButton("Reading and Writing")
+        self.lookup_rw_button.setChecked(True)
+
+        lookup_subject_layout = QHBoxLayout()
+        self.lookup_subject_group.setLayout(lookup_subject_layout)
+        lookup_subject_layout.addWidget(self.lookup_rw_button)
+        lookup_subject_layout.addWidget(self.lookup_math_button)
+
+
+        self.lookup_layout.addWidget(self.lookup_subject_group)
+
+        self.lookup_layout.addWidget(QLabel("Look Up Answer by Question ID"))
+
+        self.lookup_input = QLineEdit()
+        self.lookup_input.setPlaceholderText("Enter question ID...")
+        self.lookup_layout.addWidget(self.lookup_input)
+
+        self.lookup_button = QPushButton("Look Up")
+        self.lookup_layout.addWidget(self.lookup_button)
+
+        self.lookup_result = QLabel("")
+        self.lookup_layout.addWidget(self.lookup_result)
+
+        self.tabs.addTab(lookup_tab, "Answer Lookup")
 
     def build_title(self):
         self.title = QLabel("SAT Question Generator")
@@ -88,7 +136,7 @@ class MainWindow(QMainWindow):
         subject_layout.addWidget(self.rw_button)
         subject_layout.addWidget(self.math_button)
 
-        self.layout.addWidget(self.subject_group)
+        self.generate_layout.addWidget(self.subject_group)
 
     def build_difficulty_group(self):
         # Create difficulty group
@@ -108,7 +156,7 @@ class MainWindow(QMainWindow):
         difficulty_layout.addWidget(self.medium_button)
         difficulty_layout.addWidget(self.hard_button)
 
-        self.layout.addWidget(self.difficulty_group)
+        self.generate_layout.addWidget(self.difficulty_group)
 
     def build_question_selector(self):
         self.layout.addWidget(QLabel("Number of Questions"))
@@ -117,11 +165,11 @@ class MainWindow(QMainWindow):
         self.question_count.setRange(1, 100)
         self.question_count.setValue(20)
 
-        self.layout.addWidget(self.question_count)
+        self.generate_layout.addWidget(self.question_count)
 
     def build_generate_button(self):
         self.button = QPushButton("Generate")
-        self.layout.addWidget(self.button)
+        self.generate_layout.addWidget(self.button)
 
     def build_status_label(self):
         self.status_label = QLabel("Ready")
@@ -133,16 +181,16 @@ class MainWindow(QMainWindow):
         # Setting up the dropdown
         self.learning_area = QComboBox()
 
-        self.layout.addWidget(self.learning_area_label)
-        self.layout.addWidget(self.learning_area)
+        self.generate_layout.addWidget(self.learning_area_label)
+        self.generate_layout.addWidget(self.learning_area)
 
     def build_skill_selector(self):
         self.skill_dropdown_label = QLabel("Skill")
 
         self.skill_dropdown = QComboBox()
 
-        self.layout.addWidget(self.skill_dropdown_label)
-        self.layout.addWidget(self.skill_dropdown)
+        self.generate_layout.addWidget(self.skill_dropdown_label)
+        self.generate_layout.addWidget(self.skill_dropdown)
 
     def build_output_selector(self):
         self.output_label = QLabel("Output Folder")
@@ -151,9 +199,9 @@ class MainWindow(QMainWindow):
 
         self.output_button = QPushButton("Browse")
 
-        self.layout.addWidget(self.output_label)
-        self.layout.addWidget(self.output_path)
-        self.layout.addWidget(self.output_button)
+        self.generate_layout.addWidget(self.output_label)
+        self.generate_layout.addWidget(self.output_path)
+        self.generate_layout.addWidget(self.output_button)
 
     def choose_output_folder(self):
         folder = QFileDialog.getExistingDirectory(self, "Select Output Folder: ")
@@ -176,6 +224,8 @@ class MainWindow(QMainWindow):
 
         self.output_button.clicked.connect(self.choose_output_folder)
 
+        self.lookup_button.clicked.connect(self.handle_lookup)
+
     def update_learning_areas(self):
         if self.rw_button.isChecked():
             subject = "rw"
@@ -197,6 +247,11 @@ class MainWindow(QMainWindow):
         self.learning_area.clear()
         self.learning_area.addItems(self.skill_catalog.keys())
         self.update_skills()
+
+    def update_question_catalog(self):
+        subject = "math" if self.lookup_math_button.isChecked() else "rw"
+        self.question_catalog = load_catalog(subject)
+
 
     def update_skills(self):
         learning_area = self.learning_area.currentText()
@@ -292,3 +347,26 @@ class MainWindow(QMainWindow):
     def update_status(self, message):
         self.status_label.setText(message)
 
+    def handle_lookup(self):
+        question_id = self.lookup_input.text().strip()
+
+        if not question_id:
+            self.lookup_result.setText("Enter a question ID first.")
+            return
+
+        subject = "math" if self.lookup_math_button.isChecked() else "rw"
+        catalog = self.get_question_catalog(subject)
+
+        try:
+            results = lookup_id(catalog, question_id)
+            self.lookup_result.setText(f"Answer: {results['answer']}\n"
+                                       f"Key Page: {results['key_page']}\n"
+                                       f"Blank Page: {results['blank_page']}")
+        except ValueError as e:
+            self.lookup_result.setText(str(e))
+
+    def get_question_catalog(self, subject):
+        if subject not in self.question_catalogs.keys():
+            self.question_catalogs[subject] = load_catalog(subject)
+
+        return self.question_catalogs[subject]
