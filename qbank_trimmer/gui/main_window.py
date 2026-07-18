@@ -159,7 +159,7 @@ class MainWindow(QMainWindow):
         self.generate_layout.addWidget(self.difficulty_group)
 
     def build_question_selector(self):
-        self.layout.addWidget(QLabel("Number of Questions"))
+        self.generate_layout.addWidget(QLabel("Number of Questions"))
 
         self.question_count = QSpinBox()
         self.question_count.setRange(1, 100)
@@ -193,7 +193,7 @@ class MainWindow(QMainWindow):
         self.generate_layout.addWidget(self.skill_dropdown)
 
     def build_output_selector(self):
-        self.output_label = QLabel("Output Folder")
+        self.output_label = QLabel(f"Output Folder:")
 
         self.output_path = QLabel("Default")
 
