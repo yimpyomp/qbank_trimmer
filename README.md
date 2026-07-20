@@ -18,6 +18,7 @@ Current Version: eMFgenV1.1.1
 
 ## Known Issues
 * RW cataloging functionality is unreliable
+* Custom ouput directories from the GUI (browse button) do not work
 
 ## Download
 
