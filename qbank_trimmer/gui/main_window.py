@@ -38,6 +38,7 @@ class MainWindow(QMainWindow):
         self.question_catalogs = {}
 
         # Initializing output folder, none = default location
+        self.base_output_directory = GENERATED_DIR
         self.output_directory = None
 
         self.setWindowTitle("SAT Question Generator")
@@ -207,7 +208,7 @@ class MainWindow(QMainWindow):
         folder = QFileDialog.getExistingDirectory(self, "Select Output Folder: ")
 
         if folder:
-            self.output_directory = Path(folder)
+            self.base_output_directory = Path(folder)
             self.output_path.setText(folder)
 
     def setup_connections(self):
@@ -297,7 +298,7 @@ class MainWindow(QMainWindow):
                 "answers_output_path": self.output_directory / "selected_answers.pdf"}
 
     def start_generation(self):
-        self.output_directory = create_output_directory(GENERATED_DIR)
+        self.output_directory = create_output_directory(self.base_output_directory)
         settings = self.get_settings()
 
         self.generation_started()

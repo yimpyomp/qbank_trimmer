@@ -1,1 +1,1 @@
-__version__ = "eMFgenV1.0.3"
+__version__ = "eMFgenV1.1.2"
